@@ -1,1 +1,139 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+.storeSelectorContainer {
+  width: 60%;
+  height: auto;
+  display: grid;
+  padding-top: 5vh;
+  padding-bottom: 5vh;
+  grid-template-columns: auto auto;
+}
+
+.centerize{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+header {
+  display: flex;
+  align-items: center;
+}
+
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 132deg;
+  inherits: false;
+}
+
+:root {
+  --card-height: 65vh;
+  --card-width: calc(var(--card-height) / 1.5);
+}
+
+.card-1 {
+  background-image: url(src/assets/music background.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.card-2 {
+  background-image: url(src/assets/gold and silver background.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.card-custom {
+  /*background: #191c29;*/
+  width: var(--card-width);
+  height: var(--card-height);
+  padding: 3px;
+  position: relative;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  display: flex;
+  font-size: 1.5em;
+  color: rgb(88 199 250 / 0%);
+  cursor: pointer;
+}
+
+  .card-custom:hover {
+    color: rgb(88 199 250 / 100%);
+    transition: color 1s;
+  }
+
+    .card-custom:hover:before, .card-custom:hover:after {
+      animation: none;
+      opacity: 0;
+    }
+
+
+  .card-custom::before {
+    content: "";
+    width: 104%;
+    height: 102%;
+    border-radius: 8px;
+    background-image: linear-gradient( var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    position: absolute;
+    z-index: -1;
+    top: -1%;
+    left: -2%;
+    animation: spin 2.5s linear infinite;
+  }
+
+  .card-custom::after {
+    position: absolute;
+    content: "";
+    top: calc(var(--card-height) / 6);
+    left: 0;
+    right: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    transform: scale(0.8);
+    filter: blur(calc(var(--card-height) / 6));
+    background-image: linear-gradient( var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    opacity: 1;
+    transition: opacity .5s;
+    animation: spin 2.5s linear infinite;
+  }
+
+@keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+a {
+  color: #212534;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  margin: 0;
+  background-image: url(src/assets/background wallpaper.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position-y: -270px;
+  background-attachment: fixed;
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,0 +1,53 @@
+<div class="modalContainer">
+  <mat-card class="create-or-edit-modal">
+    <div class="left-section">
+      <div class="product-edit-container">
+        <div class="w-full lg:w-6">
+          <div style="padding-left: 1em;">
+            <h2 *ngIf="createProduct == true" style="color: aliceblue; margin-bottom: 0;">Create New Product</h2>
+            <h2 *ngIf="editProduct == true" style="padding-left: 1em; color: aliceblue; margin-bottom: 0;">edit Product</h2>
+            <label for="productName" class="block text-900 font-medium mb-2">Product Name</label>
+            <input id="productName" type="text" placeholder="enter product name" pInputText class="w-full mb-3">
+
+            <label for="metal" class="block text-900 font-medium mb-2">Metal Type</label>
+            <input id="metal" type="text" placeholder="" pInputText class="w-full mb-3">
+
+            <label for="category" class="block text-900 font-medium mb-2">Category</label>
+            <input id="category" type="text" placeholder="" pInputText class="w-full mb-3">
+
+            <label for="year" class="block text-900 font-medium mb-2">Year</label>
+            <input id="year" type="text" placeholder="" pInputText class="w-full mb-3">
+
+
+            <label for="weight" class="block text-900 font-medium mb-2">Weight</label>
+            <input id="weight" type="number" placeholder="0.00" pInputText class="w-full mb-3">
+
+            <label for="measurement" class="block text-900 font-medium mb-2">Measurement</label>
+            <input id="measurement" type="text" placeholder="" pInputText class="w-full mb-3">
+
+
+            <label for="quantity" class="block text-900 font-medium mb-2">Quantity</label>
+            <input id="quantity" type="number" placeholder="0" pInputText class="w-full mb-3">
+
+            <label for="premium" class="block text-900 font-medium mb-2">Premium</label>
+            <input id="premium" type="number" placeholder="0.00" pInputText class="w-full mb-3">
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right-section">
+      <div class="supplier-edit-container">
+        <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="closeModalFunction()"></button>
+      </div>
+
+      <div class="image-edit-container">
+        <!--<div class="card flex justify-content-center gap-2">
+          <p-confirmPopup></p-confirmPopup>
+          <p-button (click)="confirm1($event)" icon="pi pi-check" label="Confirm"></p-button>
+          <p-button (click)="confirm2($event)" icon="pi pi-times" label="Delete" severity="danger"></p-button>
+        </div>-->
+      </div>
+    </div>
+  </mat-card>
+</div>

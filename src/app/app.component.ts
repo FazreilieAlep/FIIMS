@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Angular';
+  title = 'Fastraylee Integrated Inventory System';
+
+  items: MenuItem[] | undefined;
+
+  home: MenuItem | undefined;
+
+  ngOnInit() {
+    this.items = [];
+
+    this.home = { icon: 'pi pi-home', routerLink: '/' };
+  }
 }

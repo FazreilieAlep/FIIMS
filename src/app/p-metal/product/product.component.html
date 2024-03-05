@@ -1,0 +1,55 @@
+<div style="z-index: 1; position: absolute; width: 100%;" class=" px-4 py-5 md:px-6 lg:px-8">
+  <div style="height: 12vh; width: 100%"></div>
+  <div style=" margin-top: 1em;">
+    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+  </div>
+  <div style="display: flex;">
+    <div style="width: 50%">
+      <h2 style="padding-left: 1em; color: aliceblue; margin-bottom: 0;">PRECIOUS METAL PRODUCT LIST</h2>
+    </div>
+    <div style="display: flex; align-items: end; width: 50%; font-size: 4rem; padding-right: 1em; justify-content: flex-end; ">
+      <button routerLink="/pmetal/supplier" pButton pRipple type="button" label="Precious Metal Supplier List" class="p-button-secondary p-button-text" style="margin-right:1em;"></button>
+      <p-button label="Add" (click)="openModal2()"></p-button>
+    </div>
+  </div>
+  <div style="width: 98%; padding: 2%;" class="centerize">
+    <div style="width: 100%;">
+      <p-table [value]="products"
+               [paginator]="true"
+               [rows]="5"
+               [showCurrentPageReport]="true"
+               [tableStyle]="{ 'min-width': '50rem' }"
+               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+               [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]"
+               [scrollable]="true" scrollHeight="450px">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="productName" style="width:50%">Name <p-sortIcon field="productName"></p-sortIcon></th>
+            <th pSortableColumn="weight" style="width:10%">Weight <p-sortIcon field="weight"></p-sortIcon></th>
+            <th pSortableColumn="metal" style="width:10%">Metal <p-sortIcon field="metal"></p-sortIcon></th>
+            <th pSortableColumn="price with premium" style="width:10%">Price <p-sortIcon field="price with premium"></p-sortIcon></th>
+            <th pSortableColumn="premium" style="width:10%">Premium <p-sortIcon field="premium"></p-sortIcon></th>
+            <th pSortableColumn="quantity" style="width:10%">Quantity <p-sortIcon field="quantity"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+          <tr>
+            <td><a routerLink="/pmetal/inventory/{{product.productID}}">{{ product.productName }}</a></td>
+            <td>{{ product.weight }} {{ product.measurement }}</td>
+            <td>{{ product.metal }}</td>
+            <td>{{ product.price_with_premium}}</td>
+            <td>{{ product.premium}}</td>
+            <td>{{ product.quantity }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft">
+          <p-button type="button" icon="pi pi-plus" styleClass="p-button-text" (click)="openModal2()"></p-button>
+        </ng-template>
+        <ng-template pTemplate="paginatorright">
+          <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text"></p-button>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+<app-create-or-edit-product-modal style="z-index: 2;" *ngIf="modalOpened2 == true" [createProduct]="createProduct" (closeModal)="closeModal()"></app-create-or-edit-product-modal>

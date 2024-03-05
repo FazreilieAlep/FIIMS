@@ -1,0 +1,43 @@
+<div class="px-4 py-5 md:px-6 lg:px-8">
+  <div style="height: 12vh; width: 100%"></div>
+  <div style=" margin-top: 1em;">
+    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+  </div>
+  <div style="display: flex;">
+    <div style="width: 70%">
+      <h2 style="padding-left: 1em; color: aliceblue; margin-bottom: 0;">PRECIOUS METAL SUPPLIER LIST</h2>
+    </div>
+  </div>
+  <div style="width: 98%; padding: 2%;">
+    <div style="width: 30%;">
+      <p-table [value]="suppliers"
+               [paginator]="true"
+               [rows]="5"
+               [showCurrentPageReport]="true"
+               [tableStyle]="{ 'min-width': '1rem' }"
+               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+               [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="supplierID">ID <p-sortIcon field="supplierID"></p-sortIcon></th>
+            <th pSortableColumn="supplierName">Name <p-sortIcon field="supplierName"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-supplier>
+          <tr>
+            <td><a routerLink="/pmetal/supplier/{{supplier.supplierID}}">{{ supplier.supplierID }}</a></td>
+            <td>{{ supplier.supplierName }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft">
+          <p-button type="button" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+        </ng-template>
+        <ng-template pTemplate="paginatorright">
+          <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text"></p-button>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+

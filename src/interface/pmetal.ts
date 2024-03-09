@@ -2,13 +2,14 @@ export interface pmetal {
   productID: number;
   productName: string;
   supplierName: string;
-  quantity: number;
-  images: string;
+  quantity?: number;
+  images?: string;
   category: string;
-  year: number;
+  year?: number;
   weight: number;
-  premium: number;
+  premium?: number;
   metal: number;
-  price: number;
-  price_with_premium: number
+  price?: number;
+  price_with_premium?: number,
+  delete?: boolean;
 }

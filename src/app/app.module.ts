@@ -24,6 +24,15 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CreateOrEditProductModalComponent } from './p-metal/create-or-edit-product-modal/create-or-edit-product-modal.component';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { ReactiveFormsModule } from '@angular/forms';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ToastModule } from 'primeng/toast';
+import { MusicalInstrumentComponent } from './m-instrument/musical-instrument/musical-instrument.component';
+import { MusicalInstrumentDetailsComponent } from './m-instrument/musical-instrument-details/musical-instrument-details.component';
+import { MusicalInstrumentSupplierComponent } from './m-instrument/musical-instrument-supplier/musical-instrument-supplier.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +43,10 @@ import { CreateOrEditProductModalComponent } from './p-metal/create-or-edit-prod
     SupplierComponent,
     SupplierDetailsComponent,
     CreateOrEditProductComponent,
-    CreateOrEditProductModalComponent
+    CreateOrEditProductModalComponent,
+    MusicalInstrumentComponent,
+    MusicalInstrumentDetailsComponent,
+    MusicalInstrumentSupplierComponent
   ],
   imports: [
     BrowserModule,
@@ -53,7 +65,13 @@ import { CreateOrEditProductModalComponent } from './p-metal/create-or-edit-prod
     GalleriaModule,
     CheckboxModule,
     MatCardModule,
-    MatDialogModule
+    MatDialogModule,
+    RadioButtonModule,
+    ReactiveFormsModule,
+    InputNumberModule,
+    InputTextModule,
+    MultiSelectModule,
+    ToastModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -16,7 +16,7 @@
                  [showCurrentPageReport]="true"
                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                  [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]"
-                 [globalFilterFields]="['supplierName', 'supplierID']"
+                 [globalFilterFields]="['supplierName', 'supplierID', 'address']"
                  [scrollable]="true" scrollHeight="450px">
           <ng-template pTemplate="caption">
             <div class="flex gap-2">
@@ -37,12 +37,22 @@
           <ng-template pTemplate="header">
             <tr>
               <th pSortableColumn="supplierID">
-                <span>ID</span>
-                <span><p-sortIcon field="supplierID"></p-sortIcon></span>
+                <div class="flex">
+                  <span>ID</span>
+                  <span><p-sortIcon field="supplierID"></p-sortIcon></span>
+                </div>
               </th>
               <th pSortableColumn="supplierName">
-                <span>Name</span>
-                <span><p-sortIcon field="supplierName"></p-sortIcon></span>
+                <div class="flex">
+                  <span>Name</span>
+                  <span><p-sortIcon field="supplierName"></p-sortIcon></span>
+                </div>
+              </th>
+              <th pSortableColumn="address">
+                <div class="flex">
+                  <span>Address</span>
+                  <span><p-sortIcon field="address"></p-sortIcon></span>
+                </div>
               </th>
               <th></th>
             </tr>
@@ -55,11 +65,17 @@
               <td *ngIf="!supplier.editing || delete">
                 <a routerLink="/pmetal/supplier/{{supplier.supplierID}}">{{supplier.supplierName}}</a>
               </td>
+              <td *ngIf="!supplier.editing || delete">
+                {{supplier.address}}
+              </td>
               <td *ngIf="supplier.editing && !delete">
                 <input disabled pInputText type="text" [(ngModel)]="supplier.supplierID">
               </td>
               <td *ngIf="supplier.editing && !delete">
                 <input pInputText type="text" [(ngModel)]="supplier.supplierName">
+              </td>
+              <td *ngIf="supplier.editing && !delete">
+                <input pInputText type="text" [(ngModel)]="supplier.address">
               </td>
               <td>
                 <div class="flex align-items-center justify-content-center gap-2">

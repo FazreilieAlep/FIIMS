@@ -1,19 +1,17 @@
-import { Component } from '@angular/core';
-import { supplier } from 'src/interface/supplier'
-import { PMetalService } from 'src/app/p-metal.service'
-import { MessageService, MenuItem } from 'primeng/api';
+import { Component, OnInit } from '@angular/core';
+import { supplier } from '../../../interface/supplier';
+import { MenuItem, MessageService } from 'primeng/api';
+import { PMetalService } from '../../p-metal.service';
 import { Table } from 'primeng/table';
 
 @Component({
-  selector: 'app-supplier',
-  templateUrl: './supplier.component.html',
-  styleUrls: ['./supplier.component.css'],
+  selector: 'app-musical-instrument-supplier',
+  templateUrl: './musical-instrument-supplier.component.html',
+  styleUrls: ['./musical-instrument-supplier.component.css'],
   providers: [MessageService]
 })
-export class SupplierComponent {
-
+export class MusicalInstrumentSupplierComponent{
   suppliers: supplier[] = [];
-  goldPrice = 317.74;
 
   items: MenuItem[] | undefined;
 
@@ -30,7 +28,7 @@ export class SupplierComponent {
   constructor(private pMetalService: PMetalService, private messageService: MessageService) { } // Inject PMetalService
 
   ngOnInit(): void {
-    this.items = [{ label: 'Inventory', routerLink: '/pmetal/inventory' }, { label: 'Supplier' }];
+    this.items = [{ label: 'Inventory', routerLink: '/minstrument/inventory' }, { label: 'Supplier' }];
 
     this.home = { icon: 'pi pi-home', routerLink: '/home' };
 
@@ -39,7 +37,7 @@ export class SupplierComponent {
   }
 
   loadSuppliers(): void {
-    this.pMetalService.getSuppliers()
+    this.pMetalService.getInstrumentSuppliers()
       .subscribe(suppliers => {
         this.suppliers = suppliers
         this.suppliers.forEach(supplier => supplier.editing = false);
@@ -60,17 +58,17 @@ export class SupplierComponent {
   onRowEditSave(supplier: any) {
     if (this.delete) {
       alert('supplier ' + supplier.supplierName.toString() + ' will only be deleted if there are no product attached to it, if not being removed from the table, then there are still product from this supplier listed')
-      this.pMetalService.deleteSupplier({ supplierName: supplier.supplierName, supplierID: supplier.supplierID })
+      this.pMetalService.deleteInstrumentSupplier({ supplierName: supplier.supplierName, supplierID: supplier.supplierID })
         .subscribe(() => {
           alert('OK');
           this.loadSuppliers();
         });
-      
+
       this.delete = false;
     } else {
       //console.log("updating");
       if (supplier.supplierName) {
-        this.pMetalService.updateSupplier({ update_columns: ["supplierName"], supplierName: supplier.supplierName, supplierID: supplier.supplierID })
+        this.pMetalService.updateInstrumentSupplier({ update_columns: ["supplierName", "address"], supplierName: supplier.supplierName, supplierID: supplier.supplierID , address: supplier.address })
           .subscribe(() => {
             alert('supplier ' + supplier.supplierID.toString() + ' update');
             this.loadSuppliers();
@@ -102,7 +100,7 @@ export class SupplierComponent {
   saveSupplier() {
     // save supplier api call
     if (this.newSupplierName) {
-      this.pMetalService.addSupplier({ supplierName: this.newSupplierName })
+      this.pMetalService.addInstrumentSupplier({ supplierName: this.newSupplierName })
         .subscribe(() => {
           alert(this.newSupplierName + ' update');
           this.newSupplierName = ''

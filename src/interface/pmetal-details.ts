@@ -11,5 +11,6 @@ export interface pmetal_details {
   metal: number;
   measurement: string;
   price: number;
-  price_with_premium: number
+  price_with_premium: number,
+  delete: boolean;
 }

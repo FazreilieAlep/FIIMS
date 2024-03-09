@@ -20,6 +20,9 @@ export class ProductDetailsComponent implements OnInit {
 
   home: MenuItem | undefined;
 
+  modalOpened2 = false;
+  createProduct = false;
+
   constructor(
     private route: ActivatedRoute,
     private pMetalService: PMetalService,
@@ -64,5 +67,22 @@ export class ProductDetailsComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  openModal2(toEdit: boolean): void {
+    if (this.modalOpened2 == false) {
+      if (toEdit == true) {
+        this.createProduct = false;
+      } else {
+        this.createProduct = true;
+      }
+      this.modalOpened2 = true;
+    }
+  }
+
+  closeModal(): void {
+    if (this.modalOpened2 == true) {
+      this.modalOpened2 = false;
+    }
   }
 }

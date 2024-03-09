@@ -1,0 +1,47 @@
+<div style="z-index: 1; position: absolute; width: 100%;" class="px-4 py-5 md:px-6 lg:px-8">
+  <div style="height: 7vh; width: 100%"></div>
+  <div style=" margin-top: 1em;">
+    <p-breadcrumb *ngIf="items" class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+  </div>
+  <ng-template [ngIf]="instrument">
+    <div class="flex my-3 gap-3" style="width: 100%;">
+      <div class="flex flex-column gap-3 surface-card p-4 shadow-2 border-round">
+        <div class="surface-card p-4 shadow-2 border-round flex">
+          <div style=" min-width: 30vw; margin-right: 2em; ">
+            <div style="height: auto; padding: 1em;" class="flex justify-content-center border-2 border-dashed surface-border">
+              <p-galleria [value]="images" [responsiveOptions]="responsiveOptions" [containerStyle]="{ 'max-width': '100%' }" [numVisible]="5">
+                <ng-template pTemplate="item" let-item>
+                  <img [src]="item.itemImageSrc" style="max-width : 20vw; margin-bottom: 1em;" />
+                </ng-template>
+                <ng-template pTemplate="thumbnail" let-item>
+                  <div class="grid grid-nogutter justify-content-center">
+                    <img style="height: 10vh;" [src]="item.thumbnailImageSrc" />
+                  </div>
+                </ng-template>
+              </p-galleria>
+            </div>
+          </div>
+          <div>
+            <div class="text-3xl font-medium text-900 mb-3">
+              <span style="max-width: 90%;">
+                {{instrument.instrumentName}}
+              </span>
+            </div>
+            <div class="font-medium text-500 mb-3">{{ instrument.category }}</div>
+            <div>Price              : MYR {{ instrument.price }}</div>
+            <div>Quantity           : {{ instrument.quantity }}</div>
+            <div class="flex flex-end m-1">
+              <!--<button style="min-width: 3em;" *ngIf="!instrument.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" (click)="openModal2(true)"></button>-->
+            </div>
+          </div>
+        </div>
+        <div class="surface-card p-4 shadow-2 border-round" style="display: flex;">
+          <div>
+            <p *ngFor="let paragraph of paragraphs">{{ paragraph }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <button routerLink="/minstrument/inventory" pButton pRipple type="button" label="Back" class="p-button-raised p-button-secondary"></button>
+</div>

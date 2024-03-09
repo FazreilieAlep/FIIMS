@@ -3,53 +3,130 @@
   <div style=" margin-top: 1em;">
     <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
   </div>
-  <div style="display: flex;">
-    <div style="width: 50%">
-      <h2 style="padding-left: 1em; color: aliceblue; margin-bottom: 0;">PRECIOUS METAL PRODUCT LIST</h2>
-    </div>
-    <div style="display: flex; align-items: end; width: 50%; font-size: 4rem; padding-right: 1em; justify-content: flex-end; ">
-      <button routerLink="/pmetal/supplier" pButton pRipple type="button" label="Precious Metal Supplier List" class="p-button-secondary p-button-text" style="margin-right:1em;"></button>
-      <p-button label="Add" (click)="openModal2()"></p-button>
-    </div>
-  </div>
-  <div style="width: 98%; padding: 2%;" class="centerize">
+  <div style="width: 100%;" class="my-2 centerize">
     <div style="width: 100%;">
-      <p-table [value]="products"
+      <p-table #dt1 [value]="products"
                [paginator]="true"
                [rows]="5"
                [showCurrentPageReport]="true"
-               [tableStyle]="{ 'min-width': '50rem' }"
+               [tableStyle]="{ 'min-width': '100rem', 'border-radius': '1em' }"
                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]"
-               [scrollable]="true" scrollHeight="450px">
+               [scrollable]="true" scrollHeight="450px"
+               [loading]="loading"
+               [globalFilterFields]="['productName', 'metal', 'measurement', 'weight', 'supplierName']">
+        <ng-template pTemplate="caption">
+          <div class="flex align-items-center justify-content-between">
+            <div>
+              <h2 class="m-0">PRECIOUS METAL PRODUCT LIST</h2>
+            </div>
+            <div class="flex">
+              <div class="flex">
+                <span class="p-input-icon-left ml-auto">
+                  <i class="pi pi-search"></i>
+                  <input pInputText type="text" (input)="search(dt1, $event)" placeholder="Search keyword" />
+
+                </span>
+              </div>
+              <button (click)="clickFilter()" pButton pRipple type="button" [icon]="onFilter ? 'pi pi-filter-fill' : 'pi pi-filter'" class="mx-3 p-button-rounded p-button-text"></button> <!--pi-filter-fill-->
+              <button routerLink="/pmetal/supplier" pButton pRipple type="button" label="Precious Metal Supplier List" class="p-button-secondary p-button-text"></button>
+              <p-button class="mx-4" label="Add" (click)="openModal2(false)"></p-button>
+              <button pButton pRipple icon="pi pi-refresh" class="p-button-secondary" (click)="clear(dt1)"></button>
+            </div>
+          </div>
+          <div *ngIf="onFilter" class="flex gap-2" style="margin-top: 1em;">
+            <p-columnFilter field="metal" matchMode="in" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [ngModel]="selectedMetals" [options]="metals" placeholder="Select Metal" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+
+            <p-columnFilter field="measurement" matchMode="in" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [options]="units" [(ngModel)]="selectedUnits" placeholder="Select Unit" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+
+            <p-columnFilter field="category" matchMode="in" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [options]="category" [(ngModel)]="selectedCategory" placeholder="Select Category" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+
+            <p-columnFilter field="supplierName" matchMode="in" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [options]="suppliers" [(ngModel)]="selectedSuppliers" placeholder="Select Supplier" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </ng-template>
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="productName" style="width:50%">Name <p-sortIcon field="productName"></p-sortIcon></th>
-            <th pSortableColumn="weight" style="width:10%">Weight <p-sortIcon field="weight"></p-sortIcon></th>
-            <th pSortableColumn="metal" style="width:10%">Metal <p-sortIcon field="metal"></p-sortIcon></th>
-            <th pSortableColumn="price with premium" style="width:10%">Price <p-sortIcon field="price with premium"></p-sortIcon></th>
-            <th pSortableColumn="premium" style="width:10%">Premium <p-sortIcon field="premium"></p-sortIcon></th>
-            <th pSortableColumn="quantity" style="width:10%">Quantity <p-sortIcon field="quantity"></p-sortIcon></th>
+            <th>Action </th>
+            <th pSortableColumn="productName">
+              <span>Name</span>
+              <span><p-sortIcon field="productName"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="weight">
+              <span>Weight</span>
+              <span><p-sortIcon field="weight"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="metal">
+              <span>Metal</span>
+              <span><p-sortIcon field="metal"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="category">Category </th>
+            <th pSortableColumn="price with premium">
+              <span>Price</span>
+              <span><p-sortIcon field="price with premium"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="premium">
+              <span>Premium</span>
+              <span><p-sortIcon field="premium"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="quantity">
+              <span>Quantity</span>
+              <span><p-sortIcon field="quantity"></p-sortIcon></span>
+            </th>
+            <th pSortableColumn="supplier">
+              <span>Supplier</span>
+              <span><p-sortIcon field="supplier"></p-sortIcon></span>
+            </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
+            <td>
+              <div class="flex m-0">
+                <button *ngIf="!product.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" (click)="editProduct(product)"></button>
+                <button *ngIf="product.delete" pButton pRipple type="button" icon="pi pi-check" class="p-button-rounded p-button-text" (click)="deleteProduct(product.productID)"></button> <!--(click)="proceedremoveImage(image.link)"-->
+                <button *ngIf="product.delete" pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="cancelDeleteProduct(product.productID)"></button> <!--(click)="cancelRemoveImage(image.link)"-->
+                <button [ngClass]="{'p-button-text': !product.delete}" pButton pRipple type="button" icon="pi pi-trash" class="p-button-rounded p-button-plain" (click)="confirmDelete(product.productID)"></button>  <!--(click)="removeImage(image.link)"-->
+              </div>
+            </td>
             <td><a routerLink="/pmetal/inventory/{{product.productID}}">{{ product.productName }}</a></td>
             <td>{{ product.weight }} {{ product.measurement }}</td>
             <td>{{ product.metal }}</td>
+            <td>{{ product.category }}</td>
             <td>{{ product.price_with_premium}}</td>
             <td>{{ product.premium}}</td>
             <td>{{ product.quantity }}</td>
+            <td>{{ product.supplierName }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="paginatorleft">
-          <p-button type="button" icon="pi pi-plus" styleClass="p-button-text" (click)="openModal2()"></p-button>
+          <p-button type="button" icon="pi pi-plus" styleClass="p-button-text" (click)="openModal2(false)"></p-button>
         </ng-template>
         <ng-template pTemplate="paginatorright">
-          <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text"></p-button>
+          <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text" (click)="loadProducts()"></p-button>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9">No product found.</td>
+          </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
 </div>
-<app-create-or-edit-product-modal style="z-index: 2;" *ngIf="modalOpened2 == true" [createProduct]="createProduct" (closeModal)="closeModal()"></app-create-or-edit-product-modal>
+<app-create-or-edit-product-modal style="z-index: 2;" *ngIf="modalOpened2 == true" [createProduct]="createProduct" [editProduct]="productToEdit" (closeModal)="closeModal()" (updateTable)="loadProducts()"></app-create-or-edit-product-modal>

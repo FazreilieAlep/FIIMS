@@ -1,17 +1,18 @@
-<div class="px-4 py-5 md:px-6 lg:px-8">
+<div style="z-index: 1; position: absolute; width: 100%;" class="px-4 py-5 md:px-6 lg:px-8">
+  <div style="height: 7vh; width: 100%"></div>
   <div style=" margin-top: 1em;">
     <p-breadcrumb *ngIf="items" class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
   </div>
 
-  <div class="card">
+  <!--<div class="card">
     <div style="display: flex;">
       <div style="width: 70%">
         <h2 style="padding-left: 1em; color: aliceblue;">PRODUCT DETAILS</h2>
       </div>
     </div>
-  </div>
+  </div>-->
   <ng-template [ngIf]="product">
-    <div style="width: 100%; padding: 0em 1em; margin-bottom: 2em;">
+    <div class="flex my-3" style="width: 100%;">
       <div class="surface-card p-4 shadow-2 border-round" style="display: flex;">
         <div style=" min-width: 30vw; margin-right: 2em; ">
           <div style="height: auto; padding: 1em;" class="flex justify-content-center border-2 border-dashed surface-border">
@@ -28,18 +29,26 @@
           </div>
         </div>
         <div>
-          <div class="text-3xl font-medium text-900 mb-3">{{product.productName}}</div>
-          <div class="font-medium text-500 mb-3">{{ product.metal }} {{ product.category }}, {{ product.weight }} {{product.measurement}}</div>
+          <div class="text-3xl font-medium text-900 mb-3">
+            <span style="max-width: 90%;">
+              {{product.productName}}
+            </span>
+          </div>
+          <div class="font-medium text-500 mb-3">{{ product.metal }} {{ product.category }}, {{ product.weight }} {{product.measurement}}, {{product.year}}</div>
           <div>Price              : MYR {{ product.price }}</div>
           <div>Price With Premium : MYR {{ product.price_with_premium }}</div>
           <div>Premium            : {{ product.premium }}</div>
           <div>Quantity           : {{ product.quantity }}</div>
+          <div class="flex flex-end m-1">
+            <button style="min-width: 3em;" *ngIf="!product.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" (click)="openModal2(true)"></button>
+          </div>
         </div>
       </div>
     </div>
   </ng-template>
-
+  <button routerLink="/pmetal/inventory" pButton pRipple type="button" label="Back" class="p-button-raised p-button-secondary"></button>
 </div>
+<app-create-or-edit-product-modal style="z-index: 2;" *ngIf="modalOpened2 == true" [createProduct]="createProduct" [editProduct]="product" (closeModal)="closeModal()" (updateTable)="loadProduct()"></app-create-or-edit-product-modal>
 
 <!--<div class="surface-section px-4 py-5 md:px-6 lg:px-8">
   <ul class="list-none p-0 m-0 flex align-items-center font-medium mb-3">

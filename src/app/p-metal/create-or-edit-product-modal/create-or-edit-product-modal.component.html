@@ -2,51 +2,105 @@
   <mat-card class="create-or-edit-modal">
     <div class="left-section">
       <div class="product-edit-container">
-        <div class="w-full lg:w-6">
-          <div style="padding-left: 1em;">
-            <h2 *ngIf="createProduct == true" style="color: aliceblue; margin-bottom: 0;">Create New Product</h2>
-            <h2 *ngIf="editProduct == true" style="padding-left: 1em; color: aliceblue; margin-bottom: 0;">edit Product</h2>
-            <label for="productName" class="block text-900 font-medium mb-2">Product Name</label>
-            <input id="productName" type="text" placeholder="enter product name" pInputText class="w-full mb-3">
+        <div class="w-full lg:w-10">
 
-            <label for="metal" class="block text-900 font-medium mb-2">Metal Type</label>
-            <input id="metal" type="text" placeholder="" pInputText class="w-full mb-3">
+          <div class="gap-3" style="display:grid; padding-left: 1em;">
+            <div class="w-full">
+              <h1 *ngIf="createProduct == true" style="color: darkslategrey; margin-bottom: 0; margin-top: 0.5em;">Create New Product</h1>
+              <h1 *ngIf="createProduct == false" style="padding-left: 1em; color: darkslategrey; margin-bottom: 0; margin-top: 0.5em; ">Edit Product</h1>
+            </div>
 
-            <label for="category" class="block text-900 font-medium mb-2">Category</label>
-            <input id="category" type="text" placeholder="" pInputText class="w-full mb-3">
+            <div class="w-full">
+              <label [ngClass]="{'invalid-label': !productName && saveButtonClicked}" for="productName" class="block text-900 font-medium mb-2">Product Name</label>
+              <input [disabled]="!enableEdit" class="w-full" [ngClass]="{'invalid-input': !productName && saveButtonClicked}" type="text" pInputText [(ngModel)]="productName" />
+            </div>
 
-            <label for="year" class="block text-900 font-medium mb-2">Year</label>
-            <input id="year" type="text" placeholder="" pInputText class="w-full mb-3">
+            <div class="w-full" style="display:flex;">
+              <div style="width: 50%;">
+                <label [ngClass]="{'invalid-label': !formGroup.get('selectedMetal')?.value && saveButtonClicked}" for="metal" class="block text-900 font-medium mb-2">Metal Type</label>
+                <div class="card flex">
+                  <form class="flex flex-row gap-3" [formGroup]="formGroup">
+                    <div *ngFor="let metal of metals" class="field-checkbox">
+                      <p-radioButton [ngClass]="{'ng-invalid ng-dirty': !formGroup.get('selectedMetal')?.value && saveButtonClicked}" [inputId]="metal.key" [value]="metal" formControlName="selectedMetal"></p-radioButton>
+                      <label  [for]="metal.key" class="ml-2">{{ metal.name }}</label>
+                    </div>
+                  </form>
+                </div>
+                <label [ngClass]="{'invalid-label': !formGroup.get('selectedCategory')?.value && saveButtonClicked}" for="category" class="block text-900 font-medium mb-2">Category</label>
+                <div class="card flex">
+                  <form class="flex flex-row gap-3" [formGroup]="formGroup">
+                    <div *ngFor="let category of categories" class="field-checkbox">
+                      <p-radioButton [ngClass]="{'ng-invalid ng-dirty': !formGroup.get('selectedCategory')?.value && saveButtonClicked}" [inputId]="category.key" [value]="category" formControlName="selectedCategory"></p-radioButton>
+                      <label [for]="category.key" class="ml-2">{{ category.name }}</label>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div style="width: 50%;">
+                <label for="year" class="block text-900 font-medium mb-2">Year</label>
+                <p-inputNumber [disabled]="!enableEdit" [(ngModel)]="year" mode="decimal" inputId="withoutgrouping" [useGrouping]="false"> </p-inputNumber>
+              </div>
+            </div>
 
+            <div class="w-full">
+              <div>
+                <label [ngClass]="{'invalid-label': !weight && saveButtonClicked}" for="weight" class="block text-900 font-medium mb-2">Weight</label>
+              </div>
+              <div class="card flex">
+                <p-inputNumber [disabled]="!enableEdit" [ngClass]="{'ng-invalid ng-dirty': !weight && saveButtonClicked}" inputId="integeronly" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" [(ngModel)]="weight"> </p-inputNumber>
+                <form style="align-items: center; padding-left: 1em;" class="flex flex-row gap-3" [formGroup]="formGroup">
+                  <div *ngFor="let measurement of measurements" class="field-checkbox m-0">
+                    <p-radioButton
+                                   [ngClass]="{'ng-invalid ng-dirty': !formGroup.get('selectedMeasurement')?.value && saveButtonClicked}"
+                                   [inputId]="measurement.key"
+                                   [value]="measurement"
+                                   formControlName="selectedMeasurement"></p-radioButton>
+                    <label [for]="measurement.key" class="ml-2">{{ measurement.name }}</label>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="w-full">
+              <label for="quantity" class="block text-900 font-medium mb-2">Quantity</label>
+              <p-inputNumber [disabled]="!enableEdit" inputId="integeronly" [(ngModel)]="quantity"> </p-inputNumber>
 
-            <label for="weight" class="block text-900 font-medium mb-2">Weight</label>
-            <input id="weight" type="number" placeholder="0.00" pInputText class="w-full mb-3">
-
-            <label for="measurement" class="block text-900 font-medium mb-2">Measurement</label>
-            <input id="measurement" type="text" placeholder="" pInputText class="w-full mb-3">
-
-
-            <label for="quantity" class="block text-900 font-medium mb-2">Quantity</label>
-            <input id="quantity" type="number" placeholder="0" pInputText class="w-full mb-3">
-
-            <label for="premium" class="block text-900 font-medium mb-2">Premium</label>
-            <input id="premium" type="number" placeholder="0.00" pInputText class="w-full mb-3">
-
+              <label for="premium" class="block text-900 font-medium mb-2">Premium</label>
+              <p-inputNumber [disabled]="!enableEdit" inputId="integeronly" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" [(ngModel)]="premium"> </p-inputNumber>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
-    <div class="right-section">
-      <div class="supplier-edit-container">
-        <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="closeModalFunction()"></button>
+    <div style="display: grid;" class="right-section">
+      <div class="w-full" class="supplier-edit-container">
+        <label for="supplier" class="block text-900 font-medium mb-2">Supplier</label>
+        <!--<button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="closeModalFunction()"></button>-->
+        <p-dropdown [disabled]="!enableEdit" [options]="suppliers" [ngClass]="{'ng-dirty ng-invalid': !selectedSupplier && saveButtonClicked}" [(ngModel)]="selectedSupplier" placeholder="Select a Supplier or Add New" [editable]="true" optionLabel="supplierName"></p-dropdown>
       </div>
 
-      <div class="image-edit-container">
-        <!--<div class="card flex justify-content-center gap-2">
-          <p-confirmPopup></p-confirmPopup>
-          <p-button (click)="confirm1($event)" icon="pi pi-check" label="Confirm"></p-button>
-          <p-button (click)="confirm2($event)" icon="pi pi-times" label="Delete" severity="danger"></p-button>
-        </div>-->
+      <div class="w-full image-edit-container h-auto" >
+        <div class="w-full">
+          <div class="w-full mb-2">
+            <label for="images" class="block text-900 font-medium mb-2">Image Link</label>
+            <input type="text" [disabled]="!enableEdit" class="w-10" pInputText [(ngModel)]="image" placeholder="Enter image link here, then click the add button"/>
+            <p-button [disabled]="!enableEdit" type="button" icon="pi pi-plus" styleClass="p-button-text" (click)="addImage()"></p-button>
+          </div>
+          <div style="padding-left: 1em; align-items: center; max-width: 90%;" class="w-full flex" *ngFor="let image of images">
+            <h4 style="margin: 0;">{{ image.link }}</h4>
+            <button *ngIf="!image.edit && enableEdit" pButton pRipple type="button" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-plain" style="min-width: 3em;" (click)="removeImage(image.link)"></button>
+            <button *ngIf="image.edit" pButton pRipple type="button" icon="pi pi-check" class="p-button-rounded p-button-text" style="min-width: 3em;" (click)="proceedremoveImage(image.link)"></button>
+            <button *ngIf="image.edit" pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" style="min-width: 3em;" (click)="cancelRemoveImage(image.link)"></button>
+          </div>
+        </div>
+      </div>
+      <div class="save-container w-full">
+        <span class="p-buttonset">
+          <button *ngIf="!createProduct && !enableEdit " pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" (click)="enableEditButton()"></button>
+          <button *ngIf="createProduct || enableEdit " pButton pRipple label="Save" icon="pi pi-check" (click)="save()"></button>
+          <button *ngIf="createProduct || enableEdit " pButton pRipple label="Cancel" icon="pi pi-times" (click)="closeModalFunction()" class="p-button-danger"></button>
+          <button *ngIf="!createProduct && !enableEdit " pButton pRipple label="Close" icon="pi pi-times" (click)="closeModalFunction()" class="p-button-danger"></button>
+        </span>
       </div>
     </div>
   </mat-card>

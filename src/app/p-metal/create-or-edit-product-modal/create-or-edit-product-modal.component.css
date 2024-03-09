@@ -16,6 +16,7 @@
   position: relative;
   display: flex;
   flex-direction: row;
+  background-color: aliceblue;
 }
 
 .left-section {
@@ -32,24 +33,37 @@
 }
 
 .product-edit-container {
-  background-color: aqua;
   width: 100%;
   height: auto;
-  overflow-y: scroll;
   display: flex;
   justify-content: flex-start;
   padding-left: 1em;
 }
 
 .supplier-edit-container {
-  background-color: black;
   width: 100%;
   height: 50%;
+  padding-top: 4em;
 }
 
 .image-edit-container {
-  background-color: blue;
   width: 100%;
   height: 50%;
+  overflow-y: scroll;
 }
 
+.invalid-input {
+  border: 1px solid red; /* Example: Red border for invalid input */
+}
+
+.invalid-label{
+    color: crimson !important;
+}
+
+.save-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  padding-right: 1em;
+  padding-bottom: 1em;
+}

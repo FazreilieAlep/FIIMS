@@ -14,7 +14,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 })
 export class PMetalService {
 
-  private pMetalUrl = "http://localhost:5000/";  // URL to web api
+  private pMetalUrl = "https://izz123.pythonanywhere.com/";  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })

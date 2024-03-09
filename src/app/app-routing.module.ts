@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'pmetal/inventory/:id', component: ProductDetailsComponent },
   { path: 'pmetal/supplier', component: SupplierComponent },
   { path: 'pmetal/supplier/:id', component: SupplierDetailsComponent },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
+  { path: '', redirectTo: '/home', pathMatch: 'full' }
 ];
 
 @NgModule({

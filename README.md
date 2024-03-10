@@ -1,27 +1,35 @@
-# Angular
+# Inventory Management System Personal Project
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.6.
+## Tech Stack
+- **Frontend**: Angular
+- **Backend**: Flask
+- **Database**: SQLite
 
-## Development server
+## Repository Structure
+The frontend is located in the root of this repository, while the backend part is in the `/backend` folder.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Deployment on Local Machine
+Follow the steps below to deploy the project on your local computer.
 
-## Code scaffolding
+### Setup
+1. Clone this project to your local directory (e.g., `C:\\FIIMS_project`). The cloned codes in the root folder constitute your Angular or frontend application.
+2. Open the project (`C:\\FIIMS_project`) in a code editor and run `npm install` in the project terminal to install Angular dependencies. For more details, visit the [Angular Setup Guide](https://angular.io/guide/setup-local).
+3. Now, open `C:\\FIIMS_project\backend` in another code editor and run `pip install -r requirements.txt` in the terminal to install Python dependencies.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Deployment
+1. Run `ng serve` to start the frontend server.
+2. Run `flask run --debug` in the `backend` directory to start the backend server.
 
-## Build
+### Access
+- Access the frontend application via `http://localhost:4200/`.
+- Access the backend API through `http://127.0.0.1:5000/` followed by the specific API calls.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+# API Call List
 
-## Running unit tests
+## Precious Metal Inventory
+Add details about the API calls related to the Precious Metal Inventory here.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Musical Instrument Inventory
+Add details about the API calls related to the Musical Instrument Inventory here.
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Feel free to reach out if you have any questions or need further assistance. Happy coding!

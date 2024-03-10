@@ -9,7 +9,7 @@ minstrument_blueprint = Blueprint('minstrument', __name__)
 def index():
     return 'Minstrument Index Page'
 
-DATABASE_INSTRUMENT = '/data/database 2.db'
+DATABASE_INSTRUMENT = 'data/database 2.db'
 
 def get_idb():
     db = getattr(g, '_database', None)

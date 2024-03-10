@@ -10,7 +10,7 @@ pmetal_blueprint = Blueprint('pmetal', __name__)
 def index():
     return 'Pmetal Index Page'
 
-DATABASE_PRECIOUS_METAL = '/data/database_1.db'
+DATABASE_PRECIOUS_METAL = 'data/database 1.db'
 
 @pmetal_blueprint.route('/testing')
 def test():

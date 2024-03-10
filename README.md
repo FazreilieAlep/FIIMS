@@ -1,4 +1,4 @@
-# Inventory Management System Personal Project
+![image](https://github.com/FazreilieAlep/FIIMS/assets/90892038/b23097b5-f0af-4033-add4-721dbb5617ca)# Inventory Management System Personal Project
 **Live Site**: [Inventory Management System](https://fiims-1.onrender.com/home)
 
 **Important Note:**
@@ -58,18 +58,17 @@ Follow the steps below to deploy the project on your local computer.
 | /inventory/<int:productID> | GET          | None      | Get musical instrument data with id == productID |
 | /supplier                  | GET          | None      | Get the supplier data                         |
 | /supplier/<int:supplierID> | GET          | None      | Get the supplier data where its id = supplierID |
-| /add-inventory             | POST         |      | Add new musical instrument product |
+| /add-inventory             | POST         | {'supplierName' : string, 'instrumentName' : string, 'productCategory' : string[], 'brand' : string, 'variation': string?, 'quantity': int?, 'price': float?, 'images': string[]?, 'desc': string?, 'address': string?} | Add new musical instrument product | 
 | /delete-inventory          | POST, DELETE | {"instrumentID" : int, "instrumentName" : string} | Remove a musical instrument product |
-| /add-supplier              | POST         | Male      | Add new supplier                              |
+| /add-supplier              | POST         | {"supplierID" : int, "supplierName" : string}, "address": string | Add new supplier |
 | /delete-supplier           | POST, DELETE | {"supplierID" : int, "supplierName" : string} | Remove a supplier                             |
-| /update-inventory          | POST, PUT    | { "instrumentID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a musical instrument product          |
+| /update-inventory          | POST, PUT    | { "instrumentID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a musical instrument product |
 | /update-supplier           | POST         | { "supplierID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a supplier                             |
-| /filtered-inventory        | GET, POST   |           | Get a filtered musical instrument list        |
-| /add-category              | POST         |           | Add a new instrument category                |
-| /add-brand                 | POST         |           | Add a new brand                               |
-| /delete-category           | POST, DELETE |           | Delete an instrument category label if and only if there are no instrument exist for the removed category |
-| /delete-brand              | POST, DELETE |           | Delete a brand label if and only if there are no instrument exist for the removed brand |
-| /update-category           | POST         |           | Update a category label details              |
+| /add-category              | POST         | {"productCategoryName" : string} | Add a new instrument category |
+| /add-brand                 | POST         | {"brandName" : string} | Add a new brand |
+| /delete-category           | POST, DELETE | {"productCategoryID": int, "productCategoryName": string} | Delete an instrument category label if and only if there are no instrument exist for the removed category |
+| /delete-brand              | POST, DELETE | {"brandID" : int, "brandName" : string} | Delete a brand label if and only if there are no instrument exist for the removed brand |
+| /update-category           | POST         | { "productCategoryID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a category label details              |
 
 ### Example of api usage
 API testing is done by using **APIDOG**: [https://apidog.com/]
@@ -85,6 +84,7 @@ Delete operation
 ![/api/precious-metal/delete-supplier](/src/assets/delete-supplier-api.png)
 
 Update operation
+![/api/precious-metal/update-inventory](/src/assets/update-inventory-api.png)
 
 to get column names to pass to update_columns in update API, refer the ERD diagram below
 

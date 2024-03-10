@@ -1,4 +1,4 @@
-![image](https://github.com/FazreilieAlep/FIIMS/assets/90892038/b23097b5-f0af-4033-add4-721dbb5617ca)# Inventory Management System Personal Project
+# Inventory Management System Personal Project
 **Live Site**: [Inventory Management System](https://fiims-1.onrender.com/home)
 
 **Important Note:**
@@ -79,13 +79,21 @@ Fetch operation
 - get specific precious metal by id `http://localhost:5000/api/precious-metal/inventory/:id` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory/1]
 
 Add operation
+![/api/precious-metal/add-inventory](/src/assets/add-inventory-api.png)
+![/api/musical-instrument/add-inventory](/src/assets/add-inventory-api-2.png)
 
 Delete operation
 ![/api/precious-metal/delete-supplier](/src/assets/delete-supplier-api.png)
 
 Update operation
 ![/api/precious-metal/update-inventory](/src/assets/update-inventory-api.png)
+![/api/musical-instrument/update-supplier](/src/assets/update-category-api-2.png)
 
 to get column names to pass to update_columns in update API, refer the ERD diagram below
+
+
+Search/Filter through JSON query
+
+Search/Filter through API query
 
 Feel free to reach out if you have any questions or need further assistance. Happy coding!

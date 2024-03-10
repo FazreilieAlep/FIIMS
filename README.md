@@ -94,7 +94,7 @@ Precious Metal ERD
 ![Precious Metal ERD](/src/assets/Precious-Metal-Inventory-ERD.png)
 
 Musical Instrument ERD
-![Musical Instrument ERD](/src/assets/Musical-Instrument-ERD.png)
+![Musical Instrument ERD](/src/assets/Musical-Instrument-Inventory-ERD.png)
 
 
 Search/Filter through JSON query

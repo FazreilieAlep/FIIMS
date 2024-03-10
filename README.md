@@ -89,7 +89,8 @@ Update operation
 ![/api/precious-metal/update-inventory](/src/assets/update-inventory-api.png)
 ![/api/musical-instrument/update-supplier](/src/assets/update-category-api.png)
 
-to get column names to pass to update_columns in update API, refer the ERD diagram below
+to get column names to pass to update_columns in update API, refer the ERD diagram below:
+
 Precious Metal ERD
 ![Precious Metal ERD](/src/assets/Precious-Metal-Inventory-ERD.png)
 

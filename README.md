@@ -33,7 +33,7 @@ Follow the steps below to deploy the project on your local computer.
 # API Call List
 - for POST, PUT or DELETE request method, user should send JSON object data as described in the table given.
   
-## Precious Metal Inventory (/api/precious-metal + <API> )
+## Precious Metal Inventory ( /api/precious-metal + API )
 | API                            | Method | JSON Data Format | Desc |
 |--------------------------------|--------|---------------|------|
 | /inventory  | GET | None   | get the precious metal data list |
@@ -51,7 +51,7 @@ Follow the steps below to deploy the project on your local computer.
 | /delete-random-rows | GET | None | delete the newly created random data |
 
 
-## Musical Instrument Inventory (/api/musical-instrument + <API>)
+## Musical Instrument Inventory ( /api/musical-instrument + API)
 | API                                               | Method       | JSON Data | Desc                                           |
 |---------------------------------------------------|--------------|-----------|------------------------------------------------|
 | /inventory                 | GET          | None      | Get the musical instrument data list          |
@@ -90,6 +90,11 @@ Update operation
 ![/api/musical-instrument/update-supplier](/src/assets/update-category-api.png)
 
 to get column names to pass to update_columns in update API, refer the ERD diagram below
+Precious Metal ERD
+![Precious Metal ERD](/src/assets/Precious-Metal-Inventory-ERD.png)
+
+Musical Instrument ERD
+![Musical Instrument ERD](/src/assets/Musical-Instrument-Inventory-ERD.png)
 
 
 Search/Filter through JSON query

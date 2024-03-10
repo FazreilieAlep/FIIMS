@@ -1,4 +1,10 @@
 # Inventory Management System Personal Project
+**Live Site**: [Inventory Management System](https://fiims-1.onrender.com/home)
+
+**Important Note:**
+- Please avoid refreshing the page to prevent encountering 'Not Found' error due to cloud server issues.
+- The precious metal inventory section emphasizes backend functionality, while the musical instrument inventory section focuses on frontend design. As a result, CRUD operations for musical inventory are not available on the frontend at the moment. However, CRUD operations can still be performed through the API.
+  
 
 ## Tech Stack
 - **Frontend**: Angular
@@ -25,11 +31,60 @@ Follow the steps below to deploy the project on your local computer.
 - Access the backend API through `http://127.0.0.1:5000/` followed by the specific API calls.
 
 # API Call List
+- for POST, PUT or DELETE request method, user should send JSON object data as described in the table given.
+  
+## Precious Metal Inventory (/api/precious-metal + <API> )
+| API                            | Method | JSON Data Format | Desc |
+|--------------------------------|--------|---------------|------|
+| /inventory  | GET | None   | get the precious metal data list |
+| /inventory/<int:productID>         | GET  | None | get precious metal data with id == productID |
+| /supplier     | GET  | None   | get the supplier data |
+| /supplier/<int:supplierID>     | GET  | None   | get the supplier data where its id = supplierID |
+| /add-inventory     | POST  | { "supplierName" : string, "productName" : string, "category" : string, "metal" : string, "measurement" : string, "weight" : int, "images" : string[]? 'year': int?, 'quantity': int?, 'premium': float?,}   | add new precious metal product |
+| /delete-inventory     | POST, DELETE  |  {"productID" : int, "productName" : string} | remove a precious metal product |
+| /add-supplier     | POST  | {"supplierName" : string} | add new supplier |
+| /delete-supplier     | POST, DELETE  | {"supplierID" : int, "supplierName" : string} | remove a supplier |
+| /update-inventory | POST, PUT | { "productID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | update a precious metal product |
+| /update-supplier  | POST | { "supplierID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | update a supplier |
+| /filtered-inventory | GET, POST | { "search data" : string, "filter data" : { "category" : string[], "metal" : string[], "weight" : string[], "measurement" : string[] } | get a filtered precious metal list |
+| /add-1000-random-rows  | GET | None | add 1000 randomly generated rows of precious metal data |
+| /delete-random-rows | GET | None | delete the newly created random data |
 
-## Precious Metal Inventory
-Add details about the API calls related to the Precious Metal Inventory here.
 
-## Musical Instrument Inventory
-Add details about the API calls related to the Musical Instrument Inventory here.
+## Musical Instrument Inventory (/api/musical-instrument + <API>)
+| API                                               | Method       | JSON Data | Desc                                           |
+|---------------------------------------------------|--------------|-----------|------------------------------------------------|
+| /inventory                 | GET          | None      | Get the musical instrument data list          |
+| /inventory/<int:productID> | GET          | None      | Get musical instrument data with id == productID |
+| /supplier                  | GET          | None      | Get the supplier data                         |
+| /supplier/<int:supplierID> | GET          | None      | Get the supplier data where its id = supplierID |
+| /add-inventory             | POST         |      | Add new musical instrument product |
+| /delete-inventory          | POST, DELETE | {"instrumentID" : int, "instrumentName" : string} | Remove a musical instrument product |
+| /add-supplier              | POST         | Male      | Add new supplier                              |
+| /delete-supplier           | POST, DELETE | {"supplierID" : int, "supplierName" : string} | Remove a supplier                             |
+| /update-inventory          | POST, PUT    | { "instrumentID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a musical instrument product          |
+| /update-supplier           | POST         | { "supplierID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a supplier                             |
+| /filtered-inventory        | GET, POST   |           | Get a filtered musical instrument list        |
+| /add-category              | POST         |           | Add a new instrument category                |
+| /add-brand                 | POST         |           | Add a new brand                               |
+| /delete-category           | POST, DELETE |           | Delete an instrument category label if and only if there are no instrument exist for the removed category |
+| /delete-brand              | POST, DELETE |           | Delete a brand label if and only if there are no instrument exist for the removed brand |
+| /update-category           | POST         |           | Update a category label details              |
+
+### Example of api usage
+API testing is done by using **APIDOG**: [https://apidog.com/]
+
+Fetch operation
+- get all precious metal inventory data `http://localhost:5000/api/precious-metal/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory]
+- get all musical instrument inventory data `http://localhost:5000/api/musical-instrument/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/musical-instrument/inventory]
+- get specific precious metal by id `http://localhost:5000/api/precious-metal/inventory/:id` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory/1]
+
+Add operation
+
+Delete operation
+
+Update operation
+
+to get column names to pass to update_columns in update API, refer the ERD diagram below
 
 Feel free to reach out if you have any questions or need further assistance. Happy coding!

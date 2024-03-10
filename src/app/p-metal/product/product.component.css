@@ -1,0 +1,14 @@
+td {
+  padding: 1vw 1vw;
+  width: auto;
+}
+
+@media only screen and (min-device-width: 400px) {
+  td {
+    padding: 0;
+  }
+}
+
+.p-button{
+    height: 1rem;
+}

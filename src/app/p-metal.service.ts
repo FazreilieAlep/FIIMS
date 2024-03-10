@@ -91,8 +91,8 @@ export class PMetalService {
       );
   }
 
-  updateProduct(obj: object): Observable<pmetal_details> {
-    const url = `api/precious-metal/update-inventory`;
+  updateProduct(obj: object): Observable<any> {
+    const url = '/api/precious-metal/update-inventory'; // Relative URL
     return this.httpClient.post<any>(this.url + url, obj)
       .pipe(
         catchError((error: HttpErrorResponse) => {

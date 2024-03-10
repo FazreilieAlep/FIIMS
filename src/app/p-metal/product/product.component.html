@@ -1,5 +1,4 @@
 <div style="z-index: 1; position: absolute; width: 100%;" class=" px-4 py-5 md:px-6 lg:px-8">
-  <div style="height: 12vh; width: 100%"></div>
   <div style=" margin-top: 1em;">
     <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
   </div>
@@ -9,94 +8,116 @@
                [paginator]="true"
                [rows]="5"
                [showCurrentPageReport]="true"
-               [tableStyle]="{ 'min-width': '100rem', 'border-radius': '1em' }"
+               [tableStyle]="{ 'max-width': '100rem', 'border-radius': '1em', 'font-size': '2vw'  }"
                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]"
                [scrollable]="true" scrollHeight="450px"
                [loading]="loading"
                [globalFilterFields]="['productName', 'metal', 'measurement', 'weight', 'supplierName']">
         <ng-template pTemplate="caption">
-          <div class="flex align-items-center justify-content-between">
-            <div>
-              <h2 class="m-0">PRECIOUS METAL PRODUCT LIST</h2>
+          <div class="mt-1 grid gap-1" style="align-items: center;">
+            <div style="max-width: 400px; align-self: center; padding-left: 2vw;">
+              <h1 style="font-size: 2.2vw" class="m-0">PRECIOUS METAL PRODUCT LIST</h1>
             </div>
-            <div class="flex">
-              <div class="flex">
-                <span class="p-input-icon-left ml-auto">
-                  <i class="pi pi-search"></i>
-                  <input pInputText type="text" (input)="search(dt1, $event)" placeholder="Search keyword" />
-
-                </span>
-              </div>
-              <button (click)="clickFilter()" pButton pRipple type="button" [icon]="onFilter ? 'pi pi-filter-fill' : 'pi pi-filter'" class="mx-3 p-button-rounded p-button-text"></button> <!--pi-filter-fill-->
-              <button routerLink="/pmetal/supplier" pButton pRipple type="button" label="Precious Metal Supplier List" class="p-button-secondary p-button-text"></button>
-              <p-button class="mx-4" label="Add" (click)="openModal2(false)"></p-button>
-              <button pButton pRipple icon="pi pi-refresh" class="p-button-secondary" (click)="clear(dt1)"></button>
+            <div class="pl-5 flex">
+              <span style="font-size: 1.5vw; width: auto; position: relative; padding-left: 1vw;" class="p-input-icon-right ml-auto">
+                <!--<i class="pi pi-search"></i>-->
+                <input style="padding: 1vw; font-size: 1.3vw;" pInputText type="text" (input)="search(dt1, $event)" placeholder="Search keyword" />
+              </span>
             </div>
+            <button (click)="clickFilter()" pButton pRipple type="button" class="mx-3 p-button-rounded p-button-text">
+              <i *ngIf="onFilter" class="pi pi-filter-fill" style="font-size: 2vw"></i>
+              <i *ngIf="!onFilter" class="pi pi-filter" style="font-size: 2vw"></i>
+            </button> <!--pi-filter-fill-->
+            <button style=" font-size: 1.5vw;" routerLink="/pmetal/supplier" pButton pRipple type="button" label="Supplier List" class="p-button-secondary p-button-text"></button>
+            <p-button  [style]="{'padding': '1vw'}"  class="mx-4" label="Add" (click)="openModal2(false)"></p-button>
+            <button pButton pRipple class="p-button-secondary  p-button-text" (click)="clear(dt1)">
+              <i class="pi pi-refresh" style="font-size: 2vw"></i>
+            </button>
+            <!--<div style="align-self: center; padding-left: 2vw;" class="grid gap-1 align-items-center"></div>-->
           </div>
-          <div *ngIf="onFilter" class="flex gap-2" style="margin-top: 1em;">
-            <p-columnFilter field="metal" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [ngModel]="selectedMetals" [options]="metals" placeholder="Select Metal" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+          <div *ngIf="onFilter" class="grid gap-1" style="margin-top: 1em;">
+            <p-columnFilter  [style]="{'padding': '0'}" field="metal" matchMode="in" [showMenu]="false">
+              <ng-template  [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [ngModel]="selectedMetals" [options]="metals" placeholder="Select Metal" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
 
-            <p-columnFilter field="measurement" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [options]="units" [(ngModel)]="selectedUnits" placeholder="Select Unit" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+            <p-columnFilter [style]="{'padding': '0'}" field="measurement" matchMode="in" [showMenu]="false">
+              <ng-template [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [options]="units" [(ngModel)]="selectedUnits" placeholder="Select Unit" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
 
-            <p-columnFilter field="category" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [options]="category" [(ngModel)]="selectedCategory" placeholder="Select Category" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+            <p-columnFilter [style]="{'padding': '0'}" field="category" matchMode="in" [showMenu]="false">
+              <ng-template  [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [options]="category" [(ngModel)]="selectedCategory" placeholder="Select Category" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
 
-            <p-columnFilter field="supplierName" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [options]="suppliers" [(ngModel)]="selectedSuppliers" placeholder="Select Supplier" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+            <p-columnFilter  [style]="{'padding': '0'}" field="supplierName" matchMode="in" [showMenu]="false">
+              <ng-template  [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [options]="suppliers" [(ngModel)]="selectedSuppliers" placeholder="Select Supplier" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
           </div>
         </ng-template>
         <ng-template pTemplate="header">
           <tr>
-            <th>Action </th>
+            <th style="width: auto;" >Action </th>
             <th pSortableColumn="productName">
-              <span>Name</span>
-              <span><p-sortIcon field="productName"></p-sortIcon></span>
+              <div class="flex" style="min-width: 400px;">
+                <span>Name</span>
+                <span><p-sortIcon field="productName"></p-sortIcon></span>
+              </div>
             </th>
             <th pSortableColumn="weight">
-              <span>Weight</span>
-              <span><p-sortIcon field="weight"></p-sortIcon></span>
+              <div class="flex">
+                <span>Weight</span>
+                <span><p-sortIcon field="weight"></p-sortIcon></span>
+              </div>
             </th>
             <th pSortableColumn="metal">
-              <span>Metal</span>
-              <span><p-sortIcon field="metal"></p-sortIcon></span>
+              <div class="flex">
+                <span>Metal</span>
+                <span><p-sortIcon field="metal"></p-sortIcon></span>
+              </div>
             </th>
-            <th pSortableColumn="category">Category </th>
+            <th pSortableColumn="category">
+              <div class="flex">
+                <span>Category</span>
+                <span><p-sortIcon field="category"></p-sortIcon></span>
+              </div>
+            </th>
             <th pSortableColumn="price with premium">
-              <span>Price</span>
-              <span><p-sortIcon field="price with premium"></p-sortIcon></span>
+              <div class="flex">
+                <span>Price</span>
+                <span><p-sortIcon field="price with premium"></p-sortIcon></span>
+              </div>
             </th>
             <th pSortableColumn="premium">
-              <span>Premium</span>
-              <span><p-sortIcon field="premium"></p-sortIcon></span>
+              <div class="flex">
+                <span>Premium</span>
+                <span><p-sortIcon field="premium"></p-sortIcon></span>
+              </div>
             </th>
-            <th pSortableColumn="quantity">
-              <span>Quantity</span>
-              <span><p-sortIcon field="quantity"></p-sortIcon></span>
+            <th pSortableColumn="quantity" style="min-width: auto;">
+              <div class="flex">
+                <span>Quantity</span>
+                <span><p-sortIcon field="quantity"></p-sortIcon></span>
+              </div>
             </th>
-            <th pSortableColumn="supplier">
-              <span>Supplier</span>
-              <span><p-sortIcon field="supplier"></p-sortIcon></span>
+            <th pSortableColumn="supplier" style="min-width: 200px;">
+              <div class="flex">
+                <span>Supplier</span>
+                <span><p-sortIcon field="supplier"></p-sortIcon></span>
+              </div>
             </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
-            <td>
+            <td style="width: 0.75vw; padding: 1vw">
               <div class="flex m-0">
                 <button *ngIf="!product.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" (click)="editProduct(product)"></button>
                 <button *ngIf="product.delete" pButton pRipple type="button" icon="pi pi-check" class="p-button-rounded p-button-text" (click)="deleteProduct(product.productID)"></button> <!--(click)="proceedremoveImage(image.link)"-->

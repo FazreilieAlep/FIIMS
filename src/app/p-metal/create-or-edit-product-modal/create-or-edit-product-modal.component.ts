@@ -194,7 +194,6 @@ export class CreateOrEditProductModalComponent implements OnInit{
         // Add productID to dataEditPass
         dataEditPass['productID'] = dataEdit['productID'];
         dataEditPass['update_columns'] = nonMatchingProperties;
-
         this.pMetalService.updateProduct(dataEditPass).subscribe(() => {
           this.updateTableFunction();
           this.closeModalFunction();

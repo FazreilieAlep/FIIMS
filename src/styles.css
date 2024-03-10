@@ -6,10 +6,8 @@
 .storeSelectorContainer {
   width: 60%;
   height: auto;
-  display: grid;
   padding-top: 5vh;
   padding-bottom: 5vh;
-  grid-template-columns: auto auto;
 }
 
 .centerize{
@@ -21,6 +19,7 @@
 header {
   display: flex;
   align-items: center;
+  height: auto;
 }
 
 @property --rotate {
@@ -135,5 +134,89 @@ body::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
 
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+}
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.brand-logo {
+    height: 4vw;
+    width: auto;
+    margin-left: 1vw;
+    filter: invert(1);
+  }
+
+.title {
+  font-size: 2vw;
+  margin: 0;
+  color: antiquewhite;
+}
+
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  margin: 0 !important;
+  padding: 0.75vw 1.25vw !important;
+  border: 0 none !important;
+  color: #495057 !important;
+  background: transparent !important;
+  transition: box-shadow 0.2s !important;
+  border-radius: 0 !important;
+}
+
+.p-multiselect-panel .p-multiselect-header {
+  padding: 0.75vw 1.25vw !important;
+  border-bottom: 1px solid #dee2e6;
+  color: #343a40;
+  background: #f8f9fa;
+  margin: 0;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.p-component * {
+  font-size: 1.5vw;
+}
+
+@media only screen and (min-device-width: 400px) {
+  body {
+    background-image: url(src/assets/background wallpaper.jpg);
+    background-position: center;
+    background-repeat: no-repeat; /* optional: prevents repeating the background */
+    background-size: cover; /* optional: ensures the background covers the entire viewport */
+    /*font-size: 2vw;*/
+  }
+
+  /*.p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+    margin: 0 !important;
+    padding: 1vw 1.75vw !important;
+    border: 0 none !important;
+    color: #495057 !important;
+    background: transparent !important;
+    transition: box-shadow 0.2s !important;
+    border-radius: 0 !important;
+  }
+
+  .p-multiselect-panel .p-multiselect-header {
+    padding: 1vw 1.17vw !important;
+    border-bottom: 1px solid #dee2e6;
+    color: #343a40;
+    background: #f8f9fa;
+    margin: 0;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+  }
+
+  .p-component * {
+    font-size: 2vw;
+  }*/
+}
+
+@media only screen and (min-device-width: 100px) {
+  body {
+    background-image: url(src/assets/background wallpaper.jpg);
+    background-position: center;
+    background-repeat: no-repeat; /* optional: prevents repeating the background */
+    background-size: cover; /* optional: ensures the background covers the entire viewport */
+  }
+}
+
+

@@ -1,0 +1,30 @@
+
+.image-container {
+  width: 100%; /* Ensures the container spans the width of its parent */
+  max-width: 400px; /* Set maximum width of the image */
+  position: relative; /* Allows absolute positioning of the image */
+}
+
+  .image-container img {
+    width: 100%; /* Ensures the image fills its container horizontally */
+    height: auto; /* Allows the height to adjust proportionally to the width */
+    max-width: 100%; /* Ensures the image doesn't exceed its container's width */
+    display: block; /* Ensures no space beneath the image */
+    border-radius: 50%; /* Creates a circular shape */
+  }
+
+  /* Optional: Add styles to center the image horizontally and vertically */
+  .image-container::before {
+    content: ""; /* Empty content */
+    display: block; /* Ensures the element takes up space */
+    padding-top: 100%; /* Creates a square shape based on width */
+  }
+
+  .image-container img {
+    position: absolute; /* Allows absolute positioning within the container */
+    top: 0; /* Aligns the image to the top */
+    left: 0; /* Aligns the image to the left */
+    right: 0; /* Aligns the image to the right */
+    bottom: 0; /* Aligns the image to the bottom */
+    margin: auto; /* Centers the image horizontally and vertically */
+  }

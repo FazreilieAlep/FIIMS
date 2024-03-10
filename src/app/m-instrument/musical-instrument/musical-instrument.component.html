@@ -9,38 +9,43 @@
                [paginator]="true"
                [rows]="5"
                [showCurrentPageReport]="true"
-               [tableStyle]="{ 'min-width': '25rem', 'border-radius': '1em' }"
+               [tableStyle]="{ 'min-width': '25rem', 'border-radius': '1em', 'font-size': '1.5vw' }"
                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                [rowsPerPageOptions]="[5,10,20,{showAll:'All'}]"
                [scrollable]="true" scrollHeight="450px"
                [loading]="loading"
                [globalFilterFields]="['instrumentName', 'supplierName', 'brand']">
         <ng-template pTemplate="caption">
-          <div class="flex align-items-center justify-content-between gap-2">
-            <div>
-              <h2 class="m-0">MUSICAL INSTRUMENT LIST</h2>
+          <div style="font-size: 1.5vw; width: auto; position:relative;" class="mt-1 grid gap-2">
+            <div style="align-self: center; padding-left: 2vw;">
+              <h2 style="font-size: 2.2vw"  class="m-0">MUSICAL INSTRUMENT LIST</h2>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 align-items-center">
               <div class="flex">
-                <span class="p-input-icon-left ml-auto">
-                  <i class="pi pi-search"></i>
-                  <input pInputText type="text" (input)="search(dt1, $event)" placeholder="Search keyword" />
+                <span style="font-size: 1.5vw; width: auto; position: relative; padding-left: 2vw;" class="p-input-icon-right ml-auto">
+                  <!--<i style="font-size: 1.5vw;" class="pi pi-search"></i>-->
+                  <input style="padding: 1vw; font-size: 1.3vw;" pInputText type="text" (input)="search(dt1, $event)" placeholder="Search keyword" />
                 </span>
               </div>
-              <button (click)="clickFilter()" pButton pRipple type="button" [icon]="onFilter ? 'pi pi-filter-fill' : 'pi pi-filter'" class="mx-3 p-button-rounded p-button-text"></button>
-              <button routerLink="/minstrument/supplier" pButton pRipple type="button" label="Supplier List" class="p-button-secondary p-button-text"></button>
-              <button pButton pRipple icon="pi pi-refresh" class="p-button-secondary" (click)="clear(dt1)"></button>
+              <button (click)="clickFilter()" pButton pRipple type="button" class="mx-3 p-button-rounded p-button-text">
+                <i *ngIf="onFilter" class="pi pi-filter-fill" style="font-size: 2vw"></i>
+                <i *ngIf="!onFilter" class="pi pi-filter" style="font-size: 2vw"></i>
+              </button>
+              <button style=" font-size: 1.5vw;" routerLink="/minstrument/supplier" pButton pRipple type="button" label="Supplier List" class="p-button-secondary p-button-text"></button>
+              <button pButton pRipple class="p-button-secondary p-button-text" (click)="clear(dt1)">
+                <i class="pi pi-refresh" style="font-size: 2vw"></i>
+              </button>
             </div>
           </div>
           <div *ngIf="onFilter" class="flex gap-2" style="margin-top: 1em;">
-            <p-columnFilter field="supplierName" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [options]="suppliers" [(ngModel)]="selectedSuppliers" placeholder="Select Supplier" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+            <p-columnFilter [style]="{'padding': '0'}" field="supplierName" matchMode="in" [showMenu]="false">
+              <ng-template [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [options]="suppliers" [(ngModel)]="selectedSuppliers" placeholder="Select Supplier" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
-            <p-columnFilter field="brand" matchMode="in" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-multiSelect [options]="brands" [(ngModel)]="selectedBrands" placeholder="Select Brand" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
+            <p-columnFilter [style]="{'padding': '0'}" field="brand" matchMode="in" [showMenu]="false">
+              <ng-template [style]="{'padding': '0'}" pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [style]="{'padding': '0','font-size': '1.5vw'}" [options]="brands" [(ngModel)]="selectedBrands" placeholder="Select Brand" (onChange)="filter($event.value)" display="chip" [showClear]="true"></p-multiSelect>
               </ng-template>
             </p-columnFilter>
           </div>
@@ -50,19 +55,15 @@
             <!--style="background-color: transparent !important;"-->
             <td>
               <!--style="background-color: transparent !important; border: 1px solid transparent !important"-->
-              <div class="flex gap-2">
-                <div>
-                  <p-image src="{{instrument.imageLink}}" alt="Image" width="250" [preview]="true"></p-image>
+              <div class="grid gap-2">
+                <div style="width: 30%">
+                  <div class="image-container">
+                    <img id="instrumentImage" src="{{instrument.imageLink}}" alt="Instrument Image">
+                  </div>
                 </div>
-                <div>
-                  <div class="flex gap-3" style="align-items: center;">
+                <div style="width: auto" class="flex flex-column">
+                  <div class="flex gap-3 " style="align-items: center; width:fit-content">
                     <a routerLink="/minstrument/inventory/{{instrument.instrumentID}}">{{instrument.instrumentName}}</a>
-                    <div class="flex m-0">
-                      <button *ngIf="!instrument.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" routerLink="/minstrument/inventory//{{instrument.instrumentID}}"></button> <!--(click)="editInstrument(instrument)"-->
-                      <button *ngIf="instrument.delete" pButton pRipple type="button" icon="pi pi-check" class="p-button-rounded p-button-text" (click)="deleteInstrument(instrument.instrumentID)"></button>
-                      <button *ngIf="instrument.delete" pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="cancelDeleteInstrument(instrument.instrumentID)"></button>
-                      <button [ngClass]="{'p-button-text': !instrument.delete}" pButton pRipple type="button" icon="pi pi-trash" class="p-button-rounded p-button-plain" (click)="confirmDelete(instrument.instrumentID)"></button>
-                    </div>
                   </div>
                   <div>
                     brand : {{instrument.brand}}
@@ -75,6 +76,12 @@
                   </div>
                   <div>
                     price : RM {{instrument.price}}
+                  </div>
+                  <div class="flex m-0">
+                    <button *ngIf="!instrument.delete" pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text" routerLink="/minstrument/inventory//{{instrument.instrumentID}}"></button> <!--(click)="editInstrument(instrument)"-->
+                    <button *ngIf="instrument.delete" pButton pRipple type="button" icon="pi pi-check" class="p-button-rounded p-button-text" (click)="deleteInstrument(instrument.instrumentID)"></button>
+                    <button *ngIf="instrument.delete" pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="cancelDeleteInstrument(instrument.instrumentID)"></button>
+                    <button [ngClass]="{'p-button-text': !instrument.delete}" pButton pRipple type="button" icon="pi pi-trash" class="p-button-rounded p-button-plain" (click)="confirmDelete(instrument.instrumentID)"></button>
                   </div>
                 </div>
               </div>

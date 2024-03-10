@@ -82,6 +82,7 @@ Fetch operation
 Add operation
 
 Delete operation
+![/api/precious-metal/delete-supplier](/src/assets/delete-supplier-api.png)
 
 Update operation
 

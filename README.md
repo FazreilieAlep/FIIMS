@@ -1,27 +1,90 @@
-# Angular
+# Inventory Management System Personal Project
+**Live Site**: [Inventory Management System](https://fiims-1.onrender.com/home)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.6.
+**Important Note:**
+- Please avoid refreshing the page to prevent encountering 'Not Found' error due to cloud server issues.
+- The precious metal inventory section emphasizes backend functionality, while the musical instrument inventory section focuses on frontend design. As a result, CRUD operations for musical inventory are not available on the frontend at the moment. However, CRUD operations can still be performed through the API.
+  
 
-## Development server
+## Tech Stack
+- **Frontend**: Angular
+- **Backend**: Flask
+- **Database**: SQLite
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Repository Structure
+The frontend is located in the root of this repository, while the backend part is in the `/backend` folder.
 
-## Code scaffolding
+## Deployment on Local Machine
+Follow the steps below to deploy the project on your local computer.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Setup
+1. Clone this project to your local directory (e.g., `C:\\FIIMS_project`). The cloned codes in the root folder constitute your Angular or frontend application.
+2. Open the project (`C:\\FIIMS_project`) in a code editor and run `npm install` in the project terminal to install Angular dependencies. For more details, visit the [Angular Setup Guide](https://angular.io/guide/setup-local).
+3. Now, open `C:\\FIIMS_project\backend` in another code editor and run `pip install -r requirements.txt` in the terminal to install Python dependencies.
 
-## Build
+### Deployment
+1. Run `ng serve` to start the frontend server.
+2. Run `flask run --debug` in the `backend` directory to start the backend server.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Access
+- Access the frontend application via `http://localhost:4200/`.
+- Access the backend API through `http://127.0.0.1:5000/` followed by the specific API calls.
 
-## Running unit tests
+# API Call List
+- for POST, PUT or DELETE request method, user should send JSON object data as described in the table given.
+  
+## Precious Metal Inventory (/api/precious-metal + <API> )
+| API                            | Method | JSON Data Format | Desc |
+|--------------------------------|--------|---------------|------|
+| /inventory  | GET | None   | get the precious metal data list |
+| /inventory/<int:productID>         | GET  | None | get precious metal data with id == productID |
+| /supplier     | GET  | None   | get the supplier data |
+| /supplier/<int:supplierID>     | GET  | None   | get the supplier data where its id = supplierID |
+| /add-inventory     | POST  | { "supplierName" : string, "productName" : string, "category" : string, "metal" : string, "measurement" : string, "weight" : int, "images" : string[]? 'year': int?, 'quantity': int?, 'premium': float?,}   | add new precious metal product |
+| /delete-inventory     | POST, DELETE  |  {"productID" : int, "productName" : string} | remove a precious metal product |
+| /add-supplier     | POST  | {"supplierName" : string} | add new supplier |
+| /delete-supplier     | POST, DELETE  | {"supplierID" : int, "supplierName" : string} | remove a supplier |
+| /update-inventory | POST, PUT | { "productID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | update a precious metal product |
+| /update-supplier  | POST | { "supplierID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | update a supplier |
+| /filtered-inventory | GET, POST | { "search data" : string, "filter data" : { "category" : string[], "metal" : string[], "weight" : string[], "measurement" : string[] } | get a filtered precious metal list |
+| /add-1000-random-rows  | GET | None | add 1000 randomly generated rows of precious metal data |
+| /delete-random-rows | GET | None | delete the newly created random data |
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+## Musical Instrument Inventory (/api/musical-instrument + <API>)
+| API                                               | Method       | JSON Data | Desc                                           |
+|---------------------------------------------------|--------------|-----------|------------------------------------------------|
+| /inventory                 | GET          | None      | Get the musical instrument data list          |
+| /inventory/<int:productID> | GET          | None      | Get musical instrument data with id == productID |
+| /supplier                  | GET          | None      | Get the supplier data                         |
+| /supplier/<int:supplierID> | GET          | None      | Get the supplier data where its id = supplierID |
+| /add-inventory             | POST         |      | Add new musical instrument product |
+| /delete-inventory          | POST, DELETE | {"instrumentID" : int, "instrumentName" : string} | Remove a musical instrument product |
+| /add-supplier              | POST         | Male      | Add new supplier                              |
+| /delete-supplier           | POST, DELETE | {"supplierID" : int, "supplierName" : string} | Remove a supplier                             |
+| /update-inventory          | POST, PUT    | { "instrumentID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a musical instrument product          |
+| /update-supplier           | POST         | { "supplierID": int, "update_columns": string[]; "column_name_1": ?, "column_name_2": ?, ..., "column_name_n": ?} | Update a supplier                             |
+| /filtered-inventory        | GET, POST   |           | Get a filtered musical instrument list        |
+| /add-category              | POST         |           | Add a new instrument category                |
+| /add-brand                 | POST         |           | Add a new brand                               |
+| /delete-category           | POST, DELETE |           | Delete an instrument category label if and only if there are no instrument exist for the removed category |
+| /delete-brand              | POST, DELETE |           | Delete a brand label if and only if there are no instrument exist for the removed brand |
+| /update-category           | POST         |           | Update a category label details              |
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Example of api usage
+API testing is done by using **APIDOG**: [https://apidog.com/]
 
-## Further help
+Fetch operation
+- get all precious metal inventory data `http://localhost:5000/api/precious-metal/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory]
+- get all musical instrument inventory data `http://localhost:5000/api/musical-instrument/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/musical-instrument/inventory]
+- get specific precious metal by id `http://localhost:5000/api/precious-metal/inventory/:id` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory/1]
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Add operation
+
+Delete operation
+
+Update operation
+
+to get column names to pass to update_columns in update API, refer the ERD diagram below
+
+Feel free to reach out if you have any questions or need further assistance. Happy coding!

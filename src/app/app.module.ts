@@ -33,6 +33,7 @@ import { ToastModule } from 'primeng/toast';
 import { MusicalInstrumentComponent } from './m-instrument/musical-instrument/musical-instrument.component';
 import { MusicalInstrumentDetailsComponent } from './m-instrument/musical-instrument-details/musical-instrument-details.component';
 import { MusicalInstrumentSupplierComponent } from './m-instrument/musical-instrument-supplier/musical-instrument-supplier.component';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { MusicalInstrumentSupplierComponent } from './m-instrument/musical-instr
     InputNumberModule,
     InputTextModule,
     MultiSelectModule,
-    ToastModule
+    ToastModule,
+    ScrollPanelModule
   ],
   providers: [],
   bootstrap: [AppComponent]

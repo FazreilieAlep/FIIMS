@@ -91,10 +91,10 @@ Update operation
 
 to get column names to pass to update_columns in update API, refer the ERD diagram below
 Precious Metal ERD
-![Precious Metal ERD](/src/assets/Precious Metal Inventory ERD.png)
+![Precious Metal ERD](/src/assets/Precious-Metal-Inventory-ERD.png)
 
 Musical Instrument ERD
-![Musical Instrument ERD](/src/assets/Musical Instrument ERD.png)
+![Musical Instrument ERD](/src/assets/Musical-Instrument-ERD.png)
 
 
 Search/Filter through JSON query

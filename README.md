@@ -87,12 +87,13 @@ Delete operation
 
 Update operation
 ![/api/precious-metal/update-inventory](/src/assets/update-inventory-api.png)
-![/api/musical-instrument/update-supplier](/src/assets/update-category-api-2.png)
+![/api/musical-instrument/update-supplier](/src/assets/update-category-api.png)
 
 to get column names to pass to update_columns in update API, refer the ERD diagram below
 
 
 Search/Filter through JSON query
+![/api/precious-metal/filter-inventory](/src/assets/filter-inventory-api.png)
 
 Search/Filter through API query
 

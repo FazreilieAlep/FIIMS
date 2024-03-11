@@ -37,7 +37,7 @@ Follow the steps below to deploy the project on your local computer.
 ## Precious Metal Inventory ( /api/precious-metal + API )
 | API                            | Method | JSON Data Format | Description |
 |--------------------------------|--------|---------------|------|
-| /inventory  | GET | None   | Get the precious metal data list |
+| /inventory  | GET, POST | None   | Get the precious metal data list. Has a working API query params (refer Example of API usage section --> Fetch Operation section) |
 | /inventory/<int:productID>         | GET  | None | Get precious metal data with id == productID |
 | /supplier     | GET  | None   | Get the supplier data |
 | /supplier/<int:supplierID>     | GET  | None   | Get the supplier data where its id = supplierID |
@@ -78,6 +78,8 @@ API testing is done by using **APIDOG**: [https://apidog.com/]
 - get all precious metal inventory data `http://localhost:5000/api/precious-metal/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory]
 - get all musical instrument inventory data `http://localhost:5000/api/musical-instrument/inventory` : access hosted API here [https://izz123.pythonanywhere.com/api/musical-instrument/inventory]
 - get specific precious metal by id `http://localhost:5000/api/precious-metal/inventory/:id` : access hosted API here [https://izz123.pythonanywhere.com/api/precious-metal/inventory/1]
+- get filtered data though API query by `http://localhost:5000/api/precious-metal/inventory?params=...` : sample query [https://izz123.pythonanywhere.com/api/precious-metal/inventory?metal=silver&search=scottdale&category=bar&measurement=oz]
+![/api/precious-metal/inventory?params...](/src/assets/pmetal-inventory-api-query.png)
 
 #### Add operation
 ![/api/precious-metal/add-inventory](/src/assets/add-inventory-api.png)

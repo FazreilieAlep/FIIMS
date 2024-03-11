@@ -1,6 +1,6 @@
 # Inventory Management System Personal Project
 
-**Live Site**: [Inventory Management System](https://fiims-1.onrender.com/home)
+**Live Site**: [Inventory Management System](https://fiims-1.onrender.com/)
 
 **Important Note:**
 - Please avoid refreshing the page to prevent encountering 'Not Found' errors due to cloud server issues.

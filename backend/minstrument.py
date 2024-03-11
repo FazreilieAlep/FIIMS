@@ -835,159 +835,254 @@ def add_minstrument_brand():
 @minstrument_blueprint.route('/api/musical-instrument/filtered-inventory', methods=['GET', 'POST'])
 def get_filtered_musical_instrument_inventory():
     try:
-        if request.method == 'POST':
+        if request.method == 'GET' or (request.method == 'POST' and not request.is_json):
+            search_data = request.args.get('search')
+            filter_data = request.args.to_dict(flat=False)
+
+        elif request.method == 'POST' and request.is_json:
             data = request.get_json()
-            if not data:
-                return jsonify({'error': 'No JSON data received'}), 400
+            search_data = data.get('search')
+            filter_data = {k: v if isinstance(v, list) else [v] for k, v in data.items() if k != 'search'}
+        
+        conn = get_idb()
+        cursor = conn.cursor()
 
-            conn = get_idb()
-            cursor = conn.cursor()
+        # Construct the base SQL query
+        query = '''
+                SELECT instrument.*, Supplier.*, Images.link AS imageLink
+                FROM instrument
+                LEFT JOIN Supplier ON instrument.supplierID = Supplier.supplierID
+                LEFT JOIN (
+                    SELECT instrumentID, MIN(link) AS link
+                    FROM Images
+                    GROUP BY instrumentID
+                ) AS Images ON instrument.instrumentID = Images.instrumentID
+                '''
 
-            # Construct the SQL query dynamically based on filter conditions
-            query = '''
-                    SELECT instrument.*, Supplier.*, Images.link AS imageLink
-                    FROM instrument
-                    LEFT JOIN Supplier ON instrument.supplierID = Supplier.supplierID
-                    LEFT JOIN (
-                        SELECT instrumentID, MIN(link) AS link
-                        FROM Images
-                        GROUP BY instrumentID
-                    ) AS Images ON instrument.instrumentID = Images.instrumentID
-                    '''
+        conditions = []
+        params = []
 
-            conditions = []
-            params = []
+        # Handle search condition
+        if search_data:
+            search_data = search_data.replace(' ', '').lower()
+            search_conditions = [
+                'LOWER(REPLACE(instrumentName, " ", "")) LIKE ?',
+                'LOWER(REPLACE(supplierName, " ", "")) LIKE ?',
+                'LOWER(REPLACE(metal, " ", "")) LIKE ?',
+                'LOWER(REPLACE(category, " ", "")) LIKE ?',
+                'LOWER(REPLACE(measurement, " ", "")) LIKE ?'
+            ]
+            conditions.extend(search_conditions)
+            params.extend([f'%{search_data}%'] * 5)
 
-            # search
-            search_data = data.get('search data', '').replace(' ', '').lower()
-            if search_data:
-                conditions.append('''
-                                    (LOWER(REPLACE(instrumentName, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(supplierName, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(metal, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(category, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(measurement, ' ', '')) LIKE ?)
-                                    ''')
-                params.extend([f'%{search_data}%'] * 5)
+        # Handle filter conditions
+        for field, values in filter_data.items():
+            if isinstance(values, list) and values:
+                temp = ', '.join(f"'{item}'" for item in values)
+                conditions.append(f'LOWER({field}) IN ({temp})')
 
-            # filter
-            filter_data = data.get('filter data', {})
-            metal_list = filter_data.get('metal', [])
-            category_list = filter_data.get('category', [])
-            measurement_list = filter_data.get('measurement', [])
-            supplier_list = filter_data.get('supplier', [])
-            weight_list = filter_data.get('weight', [])
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
 
-            if supplier_list:
-                temp = ', '.join(f"'{item}'" for item in supplier_list)
-                conditions.append('LOWER(supplierName) IN (' + temp + ')')
+        cursor.execute(query, params)
+        instruments = cursor.fetchall()
 
-            if metal_list:
-                temp = ', '.join(f"'{item}'" for item in metal_list)
-                conditions.append('LOWER(metal) IN (' + temp + ')')
+        column_names = [description[0] for description in cursor.description]
 
-            if category_list:
-                temp = ', '.join(f"'{item}'" for item in category_list)
-                conditions.append('LOWER(category) IN (' + temp + ')')
+        # Fetch all prices at once
+        unit_price = 'myr'
+        cursor_price = conn.cursor()
+        cursor_price.execute('''
+                            SELECT metal, unit, price_per_unit
+                            FROM Metal_Price
+                            WHERE price_unit = ?
+                            ''', (unit_price,))
 
-            if measurement_list:
-                temp = ', '.join(f"'{item}'" for item in measurement_list)
-                conditions.append('LOWER(measurement) IN (' + temp + ')')
+        price_data = cursor_price.fetchall()
+        price_dict = {(row[0], row[1]): row[2] for row in price_data}
 
-            if weight_list:
-                temp = ', '.join(weight_list)
-                conditions.append('weight IN (' + temp + ')')
+        # Map prices to instruments
+        result = []
+        for instrument in instruments:
+            instrument_dict = dict(zip(column_names, instrument))
 
-            if conditions:
-                query += ' WHERE ' + ' AND '.join(conditions)
+            # Calculate price
+            price_per_unit = price_dict.get((instrument_dict['metal'], instrument_dict['measurement']))
+            if price_per_unit is not None:
+                instrument_dict["price"] = round(price_per_unit * instrument_dict['weight'], 2)
+                instrument_dict["price_with_premium"] = round(price_per_unit * instrument_dict['weight'] * (1 + instrument_dict['premium']), 2)
+            else:
+                instrument_dict["price"] = None
 
-            cursor.execute(query, params)
-            instruments = cursor.fetchall()
+            result.append(instrument_dict)
 
-            column_names = [description[0] for description in cursor.description]
+        cursor.close()
+        cursor_price.close()
 
-            # Fetch all prices at once
-            unit_price = 'myr'
-            cursor_price = conn.cursor()
-            cursor_price.execute('''
-                                SELECT metal, unit, price_per_unit
-                                FROM Metal_Price
-                                WHERE price_unit = ?
-                                ''', (unit_price,))
+        return jsonify(result)
 
-            price_data = cursor_price.fetchall()
-            price_dict = {(row[0], row[1]): row[2] for row in price_data}
-
-            # Map prices to instruments
-            result = []
-            for instrument in instruments:
-                instrument_dict = dict(zip(column_names, instrument))
-
-                # Calculate price
-                price_per_unit = price_dict.get((instrument_dict['metal'], instrument_dict['measurement']))
-                if price_per_unit is not None:
-                    instrument_dict["price"] = round(price_per_unit * instrument_dict['weight'], 2)
-                    instrument_dict["price_with_premium"] = round(price_per_unit * instrument_dict['weight'] * (1 + instrument_dict['premium']), 2)
-                else:
-                    instrument_dict["price"] = None
-
-                result.append(instrument_dict)
-
-            cursor.close()
-            cursor_price.close()
-
-            return jsonify(result)
-        elif request.method == 'GET':
-            conn = get_idb()
-            cursor = conn.cursor()
-            cursor.execute('''
-                            SELECT instrument.*, Supplier.*, Images.link AS imageLink
-                            FROM instrument
-                            LEFT JOIN Supplier ON instrument.supplierID = Supplier.supplierID
-                            LEFT JOIN (
-                                SELECT instrumentID, MIN(link) AS link
-                                FROM Images
-                                GROUP BY instrumentID
-                            ) AS Images ON instrument.instrumentID = Images.instrumentID;
-                        ''')
-            instruments = cursor.fetchall()
-            column_names = [description[0] for description in cursor.description]
-
-            # Fetch all prices at once
-            unit_price = 'myr'
-            cursor_price = conn.cursor()
-            cursor_price.execute('''
-                                SELECT metal, unit, price_per_unit
-                                FROM Metal_Price
-                                WHERE price_unit = ?
-                                ''', (unit_price,))
-
-            price_data = cursor_price.fetchall()
-            price_dict = {(row[0], row[1]): row[2] for row in price_data}
-
-            # Map prices to instruments
-            result = []
-            for instrument in instruments:
-                instrument_dict = dict(zip(column_names, instrument))
-
-                # Calculate price
-                price_per_unit = price_dict.get((instrument_dict['metal'], instrument_dict['measurement']))
-                if price_per_unit is not None:
-                    instrument_dict["price"] = round(price_per_unit * instrument_dict['weight'], 2)
-                    instrument_dict["price_with_premium"] = round(price_per_unit * instrument_dict['weight'] * (1 + instrument_dict['premium']), 2)
-                else:
-                    instrument_dict["price"] = None
-
-                result.append(instrument_dict)
-
-            cursor.close()
-            cursor_price.close()
-
-            return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
     return 'Error'
+
+
+# @minstrument_blueprint.route('/api/musical-instrument/filtered-inventory', methods=['GET', 'POST'])
+# def get_filtered_musical_instrument_inventory():
+#     try:
+#         if request.method == 'POST':
+#             data = request.get_json()
+#             if not data:
+#                 return jsonify({'error': 'No JSON data received'}), 400
+
+#             conn = get_idb()
+#             cursor = conn.cursor()
+
+#             # Construct the SQL query dynamically based on filter conditions
+#             query = '''
+#                     SELECT instrument.*, Supplier.*, Images.link AS imageLink
+#                     FROM instrument
+#                     LEFT JOIN Supplier ON instrument.supplierID = Supplier.supplierID
+#                     LEFT JOIN (
+#                         SELECT instrumentID, MIN(link) AS link
+#                         FROM Images
+#                         GROUP BY instrumentID
+#                     ) AS Images ON instrument.instrumentID = Images.instrumentID
+#                     '''
+
+#             conditions = []
+#             params = []
+
+#             # search
+#             search_data = data.get('search data', '').replace(' ', '').lower()
+#             if search_data:
+#                 conditions.append('''
+#                                     (LOWER(REPLACE(instrumentName, ' ', '')) LIKE ?
+#                                     OR LOWER(REPLACE(supplierName, ' ', '')) LIKE ?
+#                                     OR LOWER(REPLACE(metal, ' ', '')) LIKE ?
+#                                     OR LOWER(REPLACE(category, ' ', '')) LIKE ?
+#                                     OR LOWER(REPLACE(measurement, ' ', '')) LIKE ?)
+#                                     ''')
+#                 params.extend([f'%{search_data}%'] * 5)
+
+#             # filter
+#             filter_data = data.get('filter data', {})
+#             metal_list = filter_data.get('metal', [])
+#             category_list = filter_data.get('category', [])
+#             measurement_list = filter_data.get('measurement', [])
+#             supplier_list = filter_data.get('supplier', [])
+#             weight_list = filter_data.get('weight', [])
+
+#             if supplier_list:
+#                 temp = ', '.join(f"'{item}'" for item in supplier_list)
+#                 conditions.append('LOWER(supplierName) IN (' + temp + ')')
+
+#             if metal_list:
+#                 temp = ', '.join(f"'{item}'" for item in metal_list)
+#                 conditions.append('LOWER(metal) IN (' + temp + ')')
+
+#             if category_list:
+#                 temp = ', '.join(f"'{item}'" for item in category_list)
+#                 conditions.append('LOWER(category) IN (' + temp + ')')
+
+#             if measurement_list:
+#                 temp = ', '.join(f"'{item}'" for item in measurement_list)
+#                 conditions.append('LOWER(measurement) IN (' + temp + ')')
+
+#             if weight_list:
+#                 temp = ', '.join(weight_list)
+#                 conditions.append('weight IN (' + temp + ')')
+
+#             if conditions:
+#                 query += ' WHERE ' + ' AND '.join(conditions)
+
+#             cursor.execute(query, params)
+#             instruments = cursor.fetchall()
+
+#             column_names = [description[0] for description in cursor.description]
+
+#             # Fetch all prices at once
+#             unit_price = 'myr'
+#             cursor_price = conn.cursor()
+#             cursor_price.execute('''
+#                                 SELECT metal, unit, price_per_unit
+#                                 FROM Metal_Price
+#                                 WHERE price_unit = ?
+#                                 ''', (unit_price,))
+
+#             price_data = cursor_price.fetchall()
+#             price_dict = {(row[0], row[1]): row[2] for row in price_data}
+
+#             # Map prices to instruments
+#             result = []
+#             for instrument in instruments:
+#                 instrument_dict = dict(zip(column_names, instrument))
+
+#                 # Calculate price
+#                 price_per_unit = price_dict.get((instrument_dict['metal'], instrument_dict['measurement']))
+#                 if price_per_unit is not None:
+#                     instrument_dict["price"] = round(price_per_unit * instrument_dict['weight'], 2)
+#                     instrument_dict["price_with_premium"] = round(price_per_unit * instrument_dict['weight'] * (1 + instrument_dict['premium']), 2)
+#                 else:
+#                     instrument_dict["price"] = None
+
+#                 result.append(instrument_dict)
+
+#             cursor.close()
+#             cursor_price.close()
+
+#             return jsonify(result)
+#         elif request.method == 'GET':
+#             conn = get_idb()
+#             cursor = conn.cursor()
+#             cursor.execute('''
+#                             SELECT instrument.*, Supplier.*, Images.link AS imageLink
+#                             FROM instrument
+#                             LEFT JOIN Supplier ON instrument.supplierID = Supplier.supplierID
+#                             LEFT JOIN (
+#                                 SELECT instrumentID, MIN(link) AS link
+#                                 FROM Images
+#                                 GROUP BY instrumentID
+#                             ) AS Images ON instrument.instrumentID = Images.instrumentID;
+#                         ''')
+#             instruments = cursor.fetchall()
+#             column_names = [description[0] for description in cursor.description]
+
+#             # Fetch all prices at once
+#             unit_price = 'myr'
+#             cursor_price = conn.cursor()
+#             cursor_price.execute('''
+#                                 SELECT metal, unit, price_per_unit
+#                                 FROM Metal_Price
+#                                 WHERE price_unit = ?
+#                                 ''', (unit_price,))
+
+#             price_data = cursor_price.fetchall()
+#             price_dict = {(row[0], row[1]): row[2] for row in price_data}
+
+#             # Map prices to instruments
+#             result = []
+#             for instrument in instruments:
+#                 instrument_dict = dict(zip(column_names, instrument))
+
+#                 # Calculate price
+#                 price_per_unit = price_dict.get((instrument_dict['metal'], instrument_dict['measurement']))
+#                 if price_per_unit is not None:
+#                     instrument_dict["price"] = round(price_per_unit * instrument_dict['weight'], 2)
+#                     instrument_dict["price_with_premium"] = round(price_per_unit * instrument_dict['weight'] * (1 + instrument_dict['premium']), 2)
+#                 else:
+#                     instrument_dict["price"] = None
+
+#                 result.append(instrument_dict)
+
+#             cursor.close()
+#             cursor_price.close()
+
+#             return jsonify(result)
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+
+#     return 'Error'
 
  # API to populate db with 1000 random rows
 

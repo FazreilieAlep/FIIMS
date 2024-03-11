@@ -11,7 +11,7 @@ def index():
     return 'Pmetal Index Page'
 
 DATABASE_PRECIOUS_METAL = 'data/database 1.db'
-
+   
 @pmetal_blueprint.route('/testing')
 def test():
     return 'testing'
@@ -35,52 +35,119 @@ def teardown(exception):
 
 """ APPLICATION API """
 @pmetal_blueprint.route('/api/precious-metal/inventory', methods=['GET'])
-def get_all_precious_metal_inventory():
-    conn = get_pmdb()
-    cursor = conn.cursor()
-    cursor.execute('''
-                    SELECT Product.*, Supplier.*, Images.link AS imageLink
-                    FROM Product
-                    LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
-                    LEFT JOIN (
-                        SELECT productID, MIN(link) AS link
-                        FROM Images
-                        GROUP BY productID
-                    ) AS Images ON Product.productID = Images.productID;
-                   ''')
-    products = cursor.fetchall()
-    column_names = [description[0] for description in cursor.description]  # Get column names
+def get_precious_metal_inventory():
+    try:
+        search_data = None
+        filter_data = None
 
-    result = []
-    for product in products:
-        product_dict = {}
-        for idx, value in enumerate(product):
-            product_dict[column_names[idx]] = value
+        if request.method == 'GET' or (request.method == 'POST' and not request.is_json):
+            search_data = request.args.get('search')
+            filter_data = request.args.to_dict(flat=False)
 
-        # Fetch price
-        unit = product_dict['measurement']
-        metal = product_dict['metal']
+        elif request.method == 'POST' and request.is_json:
+            data = request.get_json()
+            search_data = data.get('search')
+            filter_data = {k: v if isinstance(v, list) else [v] for k, v in data.items() if k != 'search'}
+
+        conn = get_pmdb()
+        cursor = conn.cursor()
+
+        # Construct the SQL query dynamically based on filter conditions
+        query = '''
+                SELECT Product.*, Supplier.*, Images.link AS imageLink
+                FROM Product
+                LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
+                LEFT JOIN (
+                SELECT productID, MIN(link) AS link
+                FROM Images
+                GROUP BY productID
+                ) AS Images ON Product.productID = Images.productID
+                '''
+
+        conditions = []
+        params = []
+
+        # search
+        if search_data:
+            conditions.append('''
+                        (LOWER(REPLACE(productName, ' ', '')) LIKE ?
+                        OR LOWER(REPLACE(supplierName, ' ', '')) LIKE ?
+                        OR LOWER(REPLACE(metal, ' ', '')) LIKE ?
+                        OR LOWER(REPLACE(category, ' ', '')) LIKE ?
+                        OR LOWER(REPLACE(measurement, ' ', '')) LIKE ?)
+                        ''')
+            params.extend([f'%{search_data}%'] * 5)
+
+        # filter
+        metal_list = filter_data.get('metal', [])
+        category_list = filter_data.get('category', [])
+        measurement_list = filter_data.get('measurement', [])
+        supplier_list = filter_data.get('supplier', [])
+        weight_list = filter_data.get('weight', [])
+
+        if supplier_list:
+            temp = ', '.join(f"'{item}'" for item in supplier_list)
+            conditions.append('LOWER(supplierName) IN (' + temp + ')')
+
+        if metal_list:
+            temp = ', '.join(f"'{item}'" for item in metal_list)
+            conditions.append('LOWER(metal) IN (' + temp + ')')
+
+        if category_list:
+            temp = ', '.join(f"'{item}'" for item in category_list)
+            conditions.append('LOWER(category) IN (' + temp + ')')
+
+        if measurement_list:
+            temp = ', '.join(f"'{item}'" for item in measurement_list)
+            conditions.append('LOWER(measurement) IN (' + temp + ')')
+
+        if weight_list:
+            temp = ', '.join(str(item) for item in weight_list)
+            conditions.append('weight IN (' + temp + ')')
+
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+
+        cursor.execute(query, params)
+        products = cursor.fetchall()
+
+        column_names = [description[0] for description in cursor.description]
+
+        # Fetch all prices at once
         unit_price = 'myr'
         cursor_price = conn.cursor()
         cursor_price.execute('''
-                            SELECT price_per_unit
-                            FROM Metal_Price
-                            WHERE price_unit = ? AND unit = ? AND metal = ?
-                            ''', (unit_price, unit, metal))
+                        SELECT metal, unit, price_per_unit
+                        FROM Metal_Price
+                        WHERE price_unit = ?
+                        ''', (unit_price,))
 
-        price = cursor_price.fetchone()
-        if price:
-            product_dict["price"] = round(price[0] * product_dict['weight'], 2) # Assuming price is a single value
-            product_dict["price_with_premium"] = round(price[0] * product_dict['weight'] * (1 + product_dict['premium']), 2)
-        else:
-            product_dict["price"] = None  # Handle case where price is not found
+        price_data = cursor_price.fetchall()
+        price_dict = {(row[0], row[1]): row[2] for row in price_data}
 
-        result.append(product_dict)
+        # Map prices to products
+        result = []
+        for product in products:
+            product_dict = dict(zip(column_names, product))
 
-    cursor.close()
+            # Calculate price
+            price_per_unit = price_dict.get((product_dict['metal'], product_dict['measurement']))
+            if price_per_unit is not None:
+                product_dict["price"] = round(price_per_unit * product_dict['weight'], 2)
+                product_dict["price_with_premium"] = round(price_per_unit * product_dict['weight'] * (1 + product_dict['premium']), 2)
+            else:
+                product_dict["price"] = None
 
-    # Return the data as JSON
-    return jsonify(result)
+            result.append(product_dict)
+
+        cursor.close()
+        cursor_price.close()
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    return 'Error'
 
 
 @pmetal_blueprint.route('/api/precious-metal/inventory/<int:productID>', methods=['GET'])
@@ -151,8 +218,8 @@ def get_product_by_id(productID):
             return jsonify({'error': 'Product not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Return error message and status code 500 for internal server error
-
-
+    
+    
 @pmetal_blueprint.route('/api/precious-metal/supplier', methods=['GET'])
 def get_all_precious_metal_supplier():
     conn = get_pmdb()
@@ -186,14 +253,14 @@ def get_supplier_by_id(supplierID):
                     WHERE Supplier.supplierID = ?
                    ''', (supplierID,))
     supplier = cursor.fetchone()
-
+    
     if supplier:
         column_names = [description[0] for description in cursor.description]  # Get column names
 
         supplier_dict = {}
         for idx, value in enumerate(supplier):
             supplier_dict[column_names[idx]] = value
-
+        
         cursor.close()
         return jsonify(supplier_dict)
     else:
@@ -265,8 +332,8 @@ def add_pmetal_inventory():
 
         # Insert new product into the database
         cursor.execute('''
-            INSERT INTO Product (productID, supplierID, productName, premium, category, metal, year,
-                                measurement, weight, quantity)
+            INSERT INTO Product (productID, supplierID, productName, premium, category, metal, year, 
+                                measurement, weight, quantity) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (new_product_id, supplier_id, data['productName'], data['premium'], data['category'], data['metal'], data['year'], data['measurement'], data['weight'], data['quantity']))
 
@@ -301,7 +368,7 @@ def add_pmetal_inventory():
         return jsonify({'new_product': new_product}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
 
 @pmetal_blueprint.route('/api/precious-metal/delete-inventory', methods=['POST', 'DELETE'])
 def remove_pmetal_inventory():
@@ -325,17 +392,17 @@ def remove_pmetal_inventory():
 
         # Delete product
         cursor.execute('DELETE FROM Product WHERE productID = ?', (product_id,))
-
+        
         # Delete images
         cursor.execute('DELETE FROM Images WHERE productID = ?', (product_id,))
-
+        
         conn.commit()
         cursor.close()
-
+        
         return jsonify({'message': f'{product_name} has been removed'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
 
 @pmetal_blueprint.route('/api/precious-metal/delete-supplier', methods=['POST','DELETE'])
 def remove_pmetal_supplier():
@@ -369,10 +436,10 @@ def remove_pmetal_supplier():
 
             # # change product supplierID to none
             # dataToUpdate = {
-
+                
             # }
             # update_pmetal_inventory();
-
+            
             # Delete supplier
             cursor.execute('DELETE FROM Supplier WHERE supplierID = ?', (supplier_id,))
             conn.commit()
@@ -386,7 +453,7 @@ def remove_pmetal_supplier():
     return 'Error'
 
 
-@pmetal_blueprint.route('/api/precious-metal/update-inventory', methods=['POST', 'PUT'])
+@pmetal_blueprint.route('/api/precious-metal/update-inventory', methods=['POST'])
 def update_pmetal_inventory():
     try:
         data = request.get_json()
@@ -437,14 +504,10 @@ def update_pmetal_inventory():
 
         # Insert new image links
         for image in data["images"]:
-            cursor.execute('SELECT link FROM Images WHERE lower(link) = ? AND productID = ?', (image.lower(), product_id))
-            existing_image = cursor.fetchone()
-            if existing_image is None:
-                cursor.execute('SELECT COALESCE(MAX(imageID), 0) FROM Images')
-                last_image_id = cursor.fetchone()[0]
-                new_image_id = last_image_id + 1
-                cursor.execute(insert_query, (new_image_id, product_id, image))
-
+            cursor.execute('SELECT COALESCE(MAX(imageID), 0) FROM Images')
+            last_image_id = cursor.fetchone()[0]
+            new_image_id = last_image_id + 1
+            cursor.execute(insert_query, (new_image_id, product_id, image))
 
         # Delete images that don't exist for the product
         cursor.execute(delete_query, (product_id,) + tuple(data["images"]))
@@ -457,7 +520,7 @@ def update_pmetal_inventory():
         return jsonify({'updated_product': updated_product}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
 @pmetal_blueprint.route('/api/precious-metal/update-supplier', methods=['POST'])
 def update_pmetal_supplier():
     if request.method == 'POST':
@@ -558,170 +621,177 @@ def add_pmetal_supplier():
 
     return 'Error'
 
-@pmetal_blueprint.route('/api/precious-metal/filtered-inventory', methods=['GET', 'POST'])
-def get_filtered_precious_metal_inventory():
-    try:
-        if request.method == 'POST':
-            data = request.get_json()
-            if not data:
-                return jsonify({'error': 'No JSON data received'}), 400
+# @pmetal_blueprint.route('/api/precious-metal/filtered-inventory')
+# def get_filtered_precious_metal_inventory():
+#     try:
+#         search_data = None
+#         filter_data = None
 
-            conn = get_pmdb()
-            cursor = conn.cursor()
+#         if request.method == 'GET' or (request.method == 'POST' and not request.is_json):
+#             search_data = request.args.get('search')
+#             filter_data = request.args.to_dict(flat=False)
 
-            # Construct the SQL query dynamically based on filter conditions
-            query = '''
-                    SELECT Product.*, Supplier.*, Images.link AS imageLink
-                    FROM Product
-                    LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
-                    LEFT JOIN (
-                        SELECT productID, MIN(link) AS link
-                        FROM Images
-                        GROUP BY productID
-                    ) AS Images ON Product.productID = Images.productID
-                    '''
+#         elif request.method == 'POST' and request.is_json:
+#             data = request.get_json()
+#             search_data = data.get('search')
+#             filter_data = {k: v if isinstance(v, list) else [v] for k, v in data.items() if k != 'search'}
 
-            conditions = []
-            params = []
+#         conn = get_pmdb()
+#         cursor = conn.cursor()
 
-            # search
-            search_data = data.get('search data', '').replace(' ', '').lower()
-            if search_data:
-                conditions.append('''
-                                    (LOWER(REPLACE(productName, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(supplierName, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(metal, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(category, ' ', '')) LIKE ?
-                                    OR LOWER(REPLACE(measurement, ' ', '')) LIKE ?)
-                                    ''')
-                params.extend([f'%{search_data}%'] * 5)
+#         # Construct the SQL query dynamically based on filter conditions
+#         query = '''
+#                 SELECT Product.*, Supplier.*, Images.link AS imageLink
+#                 FROM Product
+#                 LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
+#                 LEFT JOIN (
+#                 SELECT productID, MIN(link) AS link
+#                 FROM Images
+#                 GROUP BY productID
+#                 ) AS Images ON Product.productID = Images.productID
+#                 '''
 
-            # filter
-            filter_data = data.get('filter data', {})
-            metal_list = filter_data.get('metal', [])
-            category_list = filter_data.get('category', [])
-            measurement_list = filter_data.get('measurement', [])
-            supplier_list = filter_data.get('supplier', [])
-            weight_list = filter_data.get('weight', [])
+#         conditions = []
+#         params = []
 
-            if supplier_list:
-                temp = ', '.join(f"'{item}'" for item in supplier_list)
-                conditions.append('LOWER(supplierName) IN (' + temp + ')')
+#         # search
+#         if search_data:
+#             conditions.append('''
+#                         (LOWER(REPLACE(productName, ' ', '')) LIKE ?
+#                         OR LOWER(REPLACE(supplierName, ' ', '')) LIKE ?
+#                         OR LOWER(REPLACE(metal, ' ', '')) LIKE ?
+#                         OR LOWER(REPLACE(category, ' ', '')) LIKE ?
+#                         OR LOWER(REPLACE(measurement, ' ', '')) LIKE ?)
+#                         ''')
+#             params.extend([f'%{search_data}%'] * 5)
 
-            if metal_list:
-                temp = ', '.join(f"'{item}'" for item in metal_list)
-                conditions.append('LOWER(metal) IN (' + temp + ')')
+#         # filter
+#         metal_list = filter_data.get('metal', [])
+#         category_list = filter_data.get('category', [])
+#         measurement_list = filter_data.get('measurement', [])
+#         supplier_list = filter_data.get('supplier', [])
+#         weight_list = filter_data.get('weight', [])
 
-            if category_list:
-                temp = ', '.join(f"'{item}'" for item in category_list)
-                conditions.append('LOWER(category) IN (' + temp + ')')
+#         if supplier_list:
+#             temp = ', '.join(f"'{item}'" for item in supplier_list)
+#             conditions.append('LOWER(supplierName) IN (' + temp + ')')
 
-            if measurement_list:
-                temp = ', '.join(f"'{item}'" for item in measurement_list)
-                conditions.append('LOWER(measurement) IN (' + temp + ')')
+#         if metal_list:
+#             temp = ', '.join(f"'{item}'" for item in metal_list)
+#             conditions.append('LOWER(metal) IN (' + temp + ')')
 
-            if weight_list:
-                temp = ', '.join(weight_list)
-                conditions.append('weight IN (' + temp + ')')
+#         if category_list:
+#             temp = ', '.join(f"'{item}'" for item in category_list)
+#             conditions.append('LOWER(category) IN (' + temp + ')')
 
-            if conditions:
-                query += ' WHERE ' + ' AND '.join(conditions)
+#         if measurement_list:
+#             temp = ', '.join(f"'{item}'" for item in measurement_list)
+#             conditions.append('LOWER(measurement) IN (' + temp + ')')
 
-            cursor.execute(query, params)
-            products = cursor.fetchall()
+#         if weight_list:
+#             temp = ', '.join(str(item) for item in weight_list)
+#             conditions.append('weight IN (' + temp + ')')
 
-            column_names = [description[0] for description in cursor.description]
+#         if conditions:
+#             query += ' WHERE ' + ' AND '.join(conditions)
 
-            # Fetch all prices at once
-            unit_price = 'myr'
-            cursor_price = conn.cursor()
-            cursor_price.execute('''
-                                SELECT metal, unit, price_per_unit
-                                FROM Metal_Price
-                                WHERE price_unit = ?
-                                ''', (unit_price,))
+#         cursor.execute(query, params)
+#         products = cursor.fetchall()
 
-            price_data = cursor_price.fetchall()
-            price_dict = {(row[0], row[1]): row[2] for row in price_data}
+#         column_names = [description[0] for description in cursor.description]
 
-            # Map prices to products
-            result = []
-            for product in products:
-                product_dict = dict(zip(column_names, product))
+#         # Fetch all prices at once
+#         unit_price = 'myr'
+#         cursor_price = conn.cursor()
+#         cursor_price.execute('''
+#                         SELECT metal, unit, price_per_unit
+#                         FROM Metal_Price
+#                         WHERE price_unit = ?
+#                         ''', (unit_price,))
 
-                # Calculate price
-                price_per_unit = price_dict.get((product_dict['metal'], product_dict['measurement']))
-                if price_per_unit is not None:
-                    product_dict["price"] = round(price_per_unit * product_dict['weight'], 2)
-                    product_dict["price_with_premium"] = round(price_per_unit * product_dict['weight'] * (1 + product_dict['premium']), 2)
-                else:
-                    product_dict["price"] = None
+#         price_data = cursor_price.fetchall()
+#         price_dict = {(row[0], row[1]): row[2] for row in price_data}
 
-                result.append(product_dict)
+#         # Map prices to products
+#         result = []
+#         for product in products:
+#             product_dict = dict(zip(column_names, product))
 
-            cursor.close()
-            cursor_price.close()
+#             # Calculate price
+#             price_per_unit = price_dict.get((product_dict['metal'], product_dict['measurement']))
+#             if price_per_unit is not None:
+#                 product_dict["price"] = round(price_per_unit * product_dict['weight'], 2)
+#                 product_dict["price_with_premium"] = round(price_per_unit * product_dict['weight'] * (1 + product_dict['premium']), 2)
+#             else:
+#                 product_dict["price"] = None
 
-            return jsonify(result)
-        elif request.method == 'GET':
-            conn = get_pmdb()
-            cursor = conn.cursor()
-            cursor.execute('''
-                            SELECT Product.*, Supplier.*, Images.link AS imageLink
-                            FROM Product
-                            LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
-                            LEFT JOIN (
-                                SELECT productID, MIN(link) AS link
-                                FROM Images
-                                GROUP BY productID
-                            ) AS Images ON Product.productID = Images.productID;
-                        ''')
-            products = cursor.fetchall()
-            column_names = [description[0] for description in cursor.description]
+#             result.append(product_dict)
 
-            # Fetch all prices at once
-            unit_price = 'myr'
-            cursor_price = conn.cursor()
-            cursor_price.execute('''
-                                SELECT metal, unit, price_per_unit
-                                FROM Metal_Price
-                                WHERE price_unit = ?
-                                ''', (unit_price,))
+#         cursor.close()
+#         cursor_price.close()
 
-            price_data = cursor_price.fetchall()
-            price_dict = {(row[0], row[1]): row[2] for row in price_data}
+#         return jsonify(result)
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
 
-            # Map prices to products
-            result = []
-            for product in products:
-                product_dict = dict(zip(column_names, product))
+#     return 'Error'
 
-                # Calculate price
-                price_per_unit = price_dict.get((product_dict['metal'], product_dict['measurement']))
-                if price_per_unit is not None:
-                    product_dict["price"] = round(price_per_unit * product_dict['weight'], 2)
-                    product_dict["price_with_premium"] = round(price_per_unit * product_dict['weight'] * (1 + product_dict['premium']), 2)
-                else:
-                    product_dict["price"] = None
 
-                result.append(product_dict)
+# @pmetal_blueprint.route('/api/precious-metal/inventory', methods=['GET'])
+# def get_all_precious_metal_inventory():
+#     conn = get_pmdb()
+#     cursor = conn.cursor()
+#     cursor.execute('''
+#                     SELECT Product.*, Supplier.*, Images.link AS imageLink
+#                     FROM Product
+#                     LEFT JOIN Supplier ON Product.supplierID = Supplier.supplierID
+#                     LEFT JOIN (
+#                         SELECT productID, MIN(link) AS link
+#                         FROM Images
+#                         GROUP BY productID
+#                     ) AS Images ON Product.productID = Images.productID;
+#                    ''')
+#     products = cursor.fetchall()
+#     column_names = [description[0] for description in cursor.description]  # Get column names
 
-            cursor.close()
-            cursor_price.close()
+#     result = []
+#     for product in products:
+#         product_dict = {}
+#         for idx, value in enumerate(product):
+#             product_dict[column_names[idx]] = value
+        
+#         # Fetch price
+#         unit = product_dict['measurement']
+#         metal = product_dict['metal']
+#         unit_price = 'myr'
+#         cursor_price = conn.cursor()
+#         cursor_price.execute('''
+#                             SELECT price_per_unit
+#                             FROM Metal_Price
+#                             WHERE price_unit = ? AND unit = ? AND metal = ?
+#                             ''', (unit_price, unit, metal))
 
-            return jsonify(result)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+#         price = cursor_price.fetchone()
+#         if price:
+#             product_dict["price"] = round(price[0] * product_dict['weight'], 2) # Assuming price is a single value
+#             product_dict["price_with_premium"] = round(price[0] * product_dict['weight'] * (1 + product_dict['premium']), 2)
+#         else:
+#             product_dict["price"] = None  # Handle case where price is not found
+            
+#         result.append(product_dict)
 
-    return 'Error'
-
+#     cursor.close()
+    
+#     # Return the data as JSON
+#     return jsonify(result)
+ 
 # API to populate db with 1000 random rows
 @pmetal_blueprint.route('/api/precious-metal/add-1000-random-rows')
 def add_1000_random_pmetal_inventory():
     try:
         conn = get_pmdb()
         cursor = conn.cursor()
-
+        
         # Get products
         cursor.execute('SELECT productID FROM Product WHERE LOWER(productName) LIKE ?', ('%random%',))
         existing_rows = cursor.fetchall()
@@ -764,8 +834,8 @@ def add_1000_random_pmetal_inventory():
                 supplier_id = supplier_id[0]
 
             cursor.execute('''
-                INSERT INTO Product (supplierID, productName, premium, category, metal, year,
-                                    measurement, weight, quantity)
+                INSERT INTO Product (supplierID, productName, premium, category, metal, year, 
+                                    measurement, weight, quantity) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (supplier_id, data['productName'], data['premium'], data['category'], data['metal'], data['year'], data['measurement'], data['weight'], data['quantity']))
 
@@ -780,7 +850,7 @@ def add_1000_random_pmetal_inventory():
                                 INSERT INTO Images (imageID, productID, link)
                                 VALUES (?, ?, ?)
                                 ''', (new_image_id, product_id, image))
-
+        
         conn.commit()
         cursor.close()
         conn.close()
@@ -799,27 +869,27 @@ def remove_random_pmetal_inventory():
         # Get products
         cursor.execute('SELECT productID FROM Product WHERE LOWER(productName) LIKE ?', ('%random%',))
         productIDs = cursor.fetchall()
-
+        
         # Delete product
         for id_tuple in productIDs:
             product_id = id_tuple[0]
             cursor.execute('DELETE FROM Product WHERE productID = ?', (product_id,))
-
+        
         # Delete images
         for id_tuple in productIDs:
             product_id = id_tuple[0]
             cursor.execute('DELETE FROM Images WHERE productID = ?', (product_id,))
-
+            
         # Delete supplier
         cursor.execute('''
-                        DELETE FROM Supplier
+                        DELETE FROM Supplier 
                         WHERE supplierID NOT IN (SELECT DISTINCT supplierID FROM Product)
                     ''')
-
+        
         conn.commit()
         cursor.close()
         conn.close()
-
+        
         return jsonify({'message': 'Random rows have been removed'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

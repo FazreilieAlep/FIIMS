@@ -81,6 +81,18 @@ API testing is done by using **APIDOG**: [https://apidog.com/]
 - get filtered data though API query by `http://localhost:5000/api/precious-metal/inventory?params=...` : sample query [https://izz123.pythonanywhere.com/api/precious-metal/inventory?metal=silver&search=scottdale&category=bar&measurement=oz]
 ![/api/precious-metal/inventory?params...](/src/assets/pmetal-inventory-api-query.png)
 
+query details
+
+search : any string
+
+metal : [gold, silver]
+
+category : [coin, bar]
+
+measurement : [oz,g,kg]
+
+to select 2 or more categorical params(metal, category and measurement), insert params one by one. eg `[https://izz123.pythonanywhere.com/api/precious-metal/inventory?category=bar&category=coin]`
+
 #### Add operation
 ![/api/precious-metal/add-inventory](/src/assets/add-inventory-api.png)
 ![/api/musical-instrument/add-inventory](/src/assets/add-inventory-api-2.png)

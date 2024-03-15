@@ -31,10 +31,11 @@ To test the API, ensure to add the following query parameters to the API endpoin
 
 | Username | Operation | Sample | Status |
 |----------|-----------|--------|--------|
-| user_1   | VIEW      | [Sample](/src/assets/pmetal-inventory-user-1.png) | Authorized |
-| user_2   | VIEW      | [Sample](/src/assets/pmetal-inventory-user-2.png) | Restricted |
-| admin_1  | DELETE    | [Sample](/src/assets/remove-pmetal-inventory-admin-1.png) | Authorized |
-| admin_2  | DELETE    | [Sample](/src/assets/remove-pmetal-inventory-admin-2.png) | Restricted |
+| user_1   | VIEW      | <img src="/src/assets/pmetal-inventory-user-1.png" alt="user_1"> | Authorized |
+| user_2   | VIEW      | <img src="/src/assets/pmetal-inventory-user-2.png" alt="user_2"> | Restricted |
+| admin_1  | DELETE    | <img src="/src/assets/remove-pmetal-inventory-admin-1.png" alt="admin_1"> | Authorized |
+| admin_2  | DELETE    | <img src="/src/assets/remove-pmetal-inventory-admin-2.png" alt="admin_2"> | Restricted |
+
 
 
 

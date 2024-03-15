@@ -1,27 +1,40 @@
-This branch is used to test the functionality of the authorization function which determine either a user or admin can do specific CRUDS operation based on User table in `backend/data/user database.db`
+# Authorization Functionality Testing
 
-ensure to add API Query : ?user_id=<id>&username=<username> to test the API
+This branch is dedicated to testing the functionality of the authorization system, which determines whether a user or admin can perform specific CRUD operations based on roles assigned in the User table of the `backend/data/user database.db`.
 
-only /api/pmetal/ for inventory CRUD and /api/musical-instrument/inventory is tested as listed below 
-- /api/precious-metal/inventory
-- /api/precious-metal/add-inventory
-- /api/precious-metal/delete-inventory
-- /api/precious-metal/update-inventory
-- /api/musical-instrument/inventory
+## API Usage
 
-try to run the /backend file in your local database and test the API based on the following table
+To test the API, ensure to add the following query parameters to the API endpoints:
 
-**Testing User database data
-| id | username | add-pmetal-inventory | remove-pmetal-inventory | update-pmetal-inventory | view-pmetal-inventory | view-minstrument-inventory |
-| qwe123 | admin_1 | 1 | 1 | 1 | 1 | 1 |
-| qwe456 | admin_2 | 0 | 0 | 1 | 1 | 1 |
-| asd123 | user_1 | 0 | 0 | 0 | 1 | 0 |
-| asd456 | user_2 | 0 | 0 | 0 | 0 | 1 |
+?user_id=<id>&username=<username>
 
-***example API call
-| API | Sample |
-| /api/precious-metal/inventory?user_id=qwe123&username=admin_1 | ![1](/src/assets/add-inventory-api.png)|
+## Tested Endpoints
 
+- `/api/precious-metal/inventory`
+- `/api/precious-metal/add-inventory`
+- `/api/precious-metal/delete-inventory`
+- `/api/precious-metal/update-inventory`
+- `/api/musical-instrument/inventory`
+
+## Testing User Database Data
+
+### User Permissions
+
+| id     | username | add-pmetal-inventory | remove-pmetal-inventory | update-pmetal-inventory | view-pmetal-inventory | view-minstrument-inventory |
+|--------|----------|----------------------|-------------------------|-------------------------|-----------------------|----------------------------|
+| qwe123 | admin_1  | 1                    | 1                       | 1                       | 1                     | 1                          |
+| qwe456 | admin_2  | 0                    | 0                       | 1                       | 1                     | 1                          |
+| asd123 | user_1   | 0                    | 0                       | 0                       | 1                     | 0                          |
+| asd456 | user_2   | 0                    | 0                       | 0                       | 0                     | 1                          |
+
+## Example API Calls
+
+| Username | Operation | Sample | Status |
+|----------|-----------|--------|--------|
+| user_1   | VIEW      | [Sample](/src/assets/pmetal-inventory-user-1.png) | Authorized |
+| user_2   | VIEW      | [Sample](/src/assets/pmetal-inventory-user-2.png) | Restricted |
+| admin_1  | DELETE    | [Sample](/src/assets/remove-pmetal-inventory-admin-1.png) | Authorized |
+| admin_2  | DELETE    | [Sample](/src/assets/remove-pmetal-inventory-admin-2.png) | Restricted |
 
 
 

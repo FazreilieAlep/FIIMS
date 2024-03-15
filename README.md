@@ -5,7 +5,7 @@
 **Important Note:**
 - Please avoid refreshing the page to prevent encountering 'Not Found' errors due to cloud server issues.
 - The precious metal inventory section emphasizes backend functionality, while the musical instrument inventory section focuses on frontend design. As a result, CRUD operations for musical inventory are not available on the frontend at the moment. However, CRUD operations can still be performed through the API.
-- Authorization function to verify a user permission is tested on /test branch. 
+- **Authorization function** to verify a user permission is tested on `/test` branch. (for Mid-level and Senior extension task)
   
 
 ## Tech Stack

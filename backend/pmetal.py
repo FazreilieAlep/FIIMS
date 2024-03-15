@@ -3,6 +3,8 @@ from flask import jsonify, g, request
 import sqlite3
 from markupsafe import escape
 import random
+import authorization as authorize
+import json
 
 pmetal_blueprint = Blueprint('pmetal', __name__)
 
@@ -43,12 +45,20 @@ def get_precious_metal_inventory():
         if request.method == 'GET' or (request.method == 'POST' and not request.is_json):
             search_data = request.args.get('search')
             filter_data = request.args.to_dict(flat=False)
+            username = request.args.get('username')
+            user_id = request.args.get('user_id')
 
         elif request.method == 'POST' and request.is_json:
             data = request.get_json()
             search_data = data.get('search')
             filter_data = {k: v if isinstance(v, list) else [v] for k, v in data.items() if k != 'search'}
-
+            username = data.get('username')
+            user_id = data.get('user_id')
+        
+        user_permission = authorize.get_user_permission(user_id, username, 'view-pmetal-inventory')
+        if user_permission == False:
+            return username + ' is not authorized to view the inventory'
+            
         conn = get_pmdb()
         cursor = conn.cursor()
 
@@ -268,7 +278,7 @@ def get_supplier_by_id(supplierID):
         return jsonify({'error': 'Supplier not found'}), 404
 
 
-@pmetal_blueprint.route('/api/precious-metal/add-inventory', methods=['POST'])
+@pmetal_blueprint.route('/api/precious-metal/add-inventory', methods=['GET', 'POST'])
 def add_pmetal_inventory():
     try:
         conn = get_pmdb()
@@ -282,10 +292,19 @@ def add_pmetal_inventory():
             data = request.get_json()
             if not data:
                 return jsonify({'error': 'No JSON data received'}), 400
+            username = data.get('username')
+            user_id = data.get('user_id')
+            
         else:
             # If form data, retrieve data from request.form
-            data = request.form
-
+            data = request.form.to_dict()
+            username = request.args.get('username')
+            user_id = request.args.get('user_id')
+        
+        if authorize.get_user_permission(user_id, username, 'add-pmetal-inventory') == False:
+            return jsonify({'error': f'{username} is not authorized to add the inventory'}), 403
+        else:
+            return "authorized"
         # Define default values for missing fields
         default_values = {
             'year': None,
@@ -370,21 +389,40 @@ def add_pmetal_inventory():
         return jsonify({'error': str(e)}), 500
     
 
-@pmetal_blueprint.route('/api/precious-metal/delete-inventory', methods=['POST', 'DELETE'])
+@pmetal_blueprint.route('/api/precious-metal/delete-inventory', methods=['GET', 'POST', 'DELETE'])
 def remove_pmetal_inventory():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'No JSON data received'}), 400
-
-        product_id = data.get('productID')
-        product_name = data.get('productName')
-        if not product_id or not product_name:
-            return jsonify({'error': 'productID and productName are required fields'}), 400
-
         conn = get_pmdb()
         cursor = conn.cursor()
 
+        # Check content type to determine how to retrieve data
+        content_type = request.headers.get('Content-Type', '')
+
+        if 'application/json' in content_type:
+            # If JSON data, parse JSON from request body
+            data = request.get_json()
+            product_id = data.get('productID')
+            product_name = data.get('productName')
+            username = data.get('username')
+            user_id = data.get('user_id')
+            
+        else:
+            # If form data, retrieve data from request.form
+            data = request.form.to_dict()
+            product_id = request.args.get('productID')
+            product_name = request.args.get('productName')
+            username = request.args.get('username')
+            user_id = request.args.get('user_id')
+        
+        if authorize.get_user_permission(user_id, username, 'remove-pmetal-inventory') == False:
+            return jsonify({'error': f'{username} is not authorized to delete the inventory'}), 403
+        else:
+            return "authorized"
+
+        # check passed data exist or not
+        if not product_id or not product_name:
+                return jsonify({'error': 'productID and productName are required fields'}), 400
+            
         # Check if product exists
         cursor.execute('SELECT * FROM Product WHERE productID = ?', (product_id,))
         if not cursor.fetchone():
@@ -453,17 +491,35 @@ def remove_pmetal_supplier():
     return 'Error'
 
 
-@pmetal_blueprint.route('/api/precious-metal/update-inventory', methods=['POST'])
+@pmetal_blueprint.route('/api/precious-metal/update-inventory', methods=['GET', 'POST'])
 def update_pmetal_inventory():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'No JSON data received'}), 400
+        # Check content type to determine how to retrieve data
+        content_type = request.headers.get('Content-Type', '')
 
-        product_id = data.get('productID')
-        update_columns = data.get('update_columns')
+        if 'application/json' in content_type:
+            # If JSON data, parse JSON from request body
+            data = request.get_json()
+            product_id = data.get('productID')
+            update_columns = data.get('update_columns')
+            username = data.get('username')
+            user_id = data.get('user_id')
+            
+        else:
+            # If form data, retrieve data from request.form
+            data = request.form.to_dict()
+            product_id = request.args.get('productID')
+            update_columns = request.args.get('update_columns')
+            username = request.args.get('username')
+            user_id = request.args.get('user_id')
+        
+        if authorize.get_user_permission(user_id, username, 'update-pmetal-inventory') == False:
+            return jsonify({'error': f'{username} is not authorized to update the inventory'}), 403
+        else:
+            return "authorized"
+        
         if not product_id or not update_columns:
-            return jsonify({'error': 'productID and update_columns are required fields'}), 400
+                return jsonify({'error': 'productID and update_columns are required fields'}), 400
 
         conn = get_pmdb()
         cursor = conn.cursor()

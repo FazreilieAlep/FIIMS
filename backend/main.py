@@ -14,5 +14,6 @@ minstrument_blueprint = minstrument.get_minstrument_blueprint()
 app.register_blueprint(pmetal_blueprint)
 app.register_blueprint(minstrument_blueprint)
 
+
 if __name__ == '__main__':
     app.run()
